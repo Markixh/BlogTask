@@ -1,0 +1,15 @@
+﻿@model BlogTask.Models.Article.AddViewModel;
+
+@{
+    ViewData["Title"] = "Добавление статьи";
+}
+<div class="main">
+    <div class="form">        
+        <h2>Добавление статьи</h2>
+        <form method="post" asp-controller="Article" asp-action="Add">           
+            <input type="text" asp-for="Title" placeholder="заголовок">
+            <textarea type="text" asp-for="Text" rows="5" placeholder="контекст"></textarea>
+            <button>Добавить</button>
+        </form>
+    </div>
+</div>

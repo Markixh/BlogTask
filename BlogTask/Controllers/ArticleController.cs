@@ -11,7 +11,7 @@ namespace BlogTask.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ArticleController : ControllerBase
+    public class ArticleController : Controller
     {
         private readonly ArticlesRepository _repository;
         private readonly IMapper _mapper;
@@ -128,6 +128,17 @@ namespace BlogTask.Controllers
             await _repository.DeleteAsync(article);
 
             return StatusCode(200);
+        }
+
+        /// <summary>
+        /// Вывод формы для добавления статьи
+        /// </summary>
+        /// <returns></returns>
+        [Route("Add")]
+        [HttpGet]
+        public IActionResult Add()
+        {
+            return View();
         }
     }
 }
