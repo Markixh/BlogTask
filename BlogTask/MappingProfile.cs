@@ -4,6 +4,7 @@ using BlogTask.Contracts.Models.Comment;
 using BlogTask.Contracts.Models.Tags;
 using BlogTask.Contracts.Models.Users;
 using BlogTask.Data.Models;
+using BlogTask.Models.Account;
 using static BlogTask.Contracts.Models.Users.GetUserRequest;
 
 namespace BlogTask
@@ -25,6 +26,8 @@ namespace BlogTask
             CreateMap<UserView, User>();
             CreateMap<Article, ArticleView>();
             CreateMap<Tag, TagView>();
+
+            CreateMap<LoginViewModel, User>();
         }
     }
 }
