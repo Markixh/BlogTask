@@ -12,7 +12,7 @@ namespace BlogTask.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TagController : ControllerBase
+    public class TagController : Controller
     {
         private readonly TagsRepository _repository;
         private readonly IMapper _mapper;
@@ -124,6 +124,17 @@ namespace BlogTask.Controllers
             await _repository.DeleteAsync(await tag);
 
             return StatusCode(200);
+        }
+
+        /// <summary>
+        /// Вывод формы для добавления тега
+        /// </summary>
+        /// <returns></returns>
+        [Route("Add")]
+        [HttpGet]
+        public IActionResult Add()
+        {
+            return View();
         }
     }
 }

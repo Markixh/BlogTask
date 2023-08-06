@@ -20,7 +20,6 @@ namespace BlogTask.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         public IActionResult Index()
         {
             return View("Login");
