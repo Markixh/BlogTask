@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Регистрация";
+}
+
+@model BlogTask.Models.Account.RegisterViewModel;
+
+<link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+
+<div class="login-page">
+    <div class="form">
+        <form class="register-form" method="post" asp-controller="Register" asp-action="Register">
+            <input type="text" asp-for="Login" placeholder="логин" />
+            <input type="text" asp-for="FirstName" placeholder="имя" />
+            <input type="text" asp-for="LastName" placeholder="фамилия" />
+            <input type="password" asp-for="Password" placeholder="пароль" />
+            <button>Зарегистрироваться</button>
+            <p class="message">Уже зарегистрирован? <a href="AccountManager">Выполните вход</a></p>
+        </form>
+    </div>
+</div>

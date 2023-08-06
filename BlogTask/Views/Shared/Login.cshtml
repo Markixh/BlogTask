@@ -1,5 +1,4 @@
-﻿@model BlogTask.Models.Account.LoginViewModel
-.
+﻿@model BlogTask.Models.Account.LoginViewModel;
 
 <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
 
@@ -9,7 +8,7 @@
             <input type="text" asp-for="Login" placeholder="логин" />
             <input type="password" asp-for="Password" placeholder="пароль" />
             <button>Вход</button>
-            <p class="message">Не зарегистрированы? <a href="#">Создайте аккаунт</a></p>
+            <p class="message">Не зарегистрированы? <a href="Register">Создайте аккаунт</a></p>
         </form>
     </div>
 </div>

@@ -28,6 +28,7 @@ namespace BlogTask
             CreateMap<Tag, TagView>();
 
             CreateMap<LoginViewModel, User>();
+            CreateMap<RegisterViewModel, User>();
         }
     }
 }
