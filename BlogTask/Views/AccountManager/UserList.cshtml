@@ -1,0 +1,15 @@
+﻿@model BlogTask.Models.Account.ListViewModel;
+
+@if (Model.UserList.Count != 0)
+{
+    @foreach (var user in @Model.UserList)
+    {
+        <div class="card">
+            <h5 class="card-header">Имя пользователя</h5>
+            <div class="card-body">
+                <h5 class="card-title">Special title treatment</h5>
+                <span class="badge bg-primary">Роли</span>
+            </div>
+        </div>
+    }
+}

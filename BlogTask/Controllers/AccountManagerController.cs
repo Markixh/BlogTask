@@ -67,6 +67,22 @@ namespace BlogTask.Controllers
             return View("Edit");
         }
 
+        /// <summary>
+        /// Получить список пользователей
+        /// </summary>       
+        /// <returns></returns>
+        [Route("UserList")]
+        [HttpGet]
+        public async Task<IActionResult> UserList()
+        {
+            var user = User;
+            
+
+            //if (result == null) return View("UserListNoButton", model);
+            return View("UserList");
+        }
+
+
 
         public bool PasswordIsCorrect(User user)
         {
