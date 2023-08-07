@@ -147,5 +147,16 @@ namespace BlogTask.Controllers
         {
             return View();
         }
+
+        /// <summary>
+        /// Вывод списка тегов
+        /// </summary>
+        /// <returns></returns>
+        [Route("List")]
+        [HttpGet]
+        public IActionResult List()
+        {
+            return View("List");
+        }
     }
 }

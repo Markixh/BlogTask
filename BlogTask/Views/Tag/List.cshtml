@@ -1,0 +1,14 @@
+﻿@model BlogTask.Models.Tag.ListViewModel;
+
+@if (Model.List.Count != 0)
+{
+    @foreach (var user in @Model.List)
+    {
+        <div class="card">
+            <h5 class="card-header">Название тега</h5>
+            <div class="card-body">                
+                
+            </div>
+        </div>
+    }
+}
