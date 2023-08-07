@@ -3,12 +3,14 @@ using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 using BlogTask.Models.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace BlogTask.Controllers
 {
+    [Route("[controller]")]
     public class AccountManagerController : Controller
     {
         private IMapper _mapper;
@@ -47,6 +49,24 @@ namespace BlogTask.Controllers
 
             return RedirectToAction("Home", "error");
         }
+
+        /// <summary>
+        /// Страница по редактированию информации о пользователе
+        /// </summary>
+        /// <returns></returns>
+        [Route("Edit")]
+        [HttpGet]
+        public async Task<IActionResult> Edit()
+        {
+            var user = User;
+
+            //var result = await _userManager.GetUserAsync(user);
+
+            //var editmodel = _mapper.Map<UserEditViewModel>(result);
+
+            return View("Edit");
+        }
+
 
         public bool PasswordIsCorrect(User user)
         {

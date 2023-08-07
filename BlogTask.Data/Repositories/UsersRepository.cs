@@ -65,7 +65,7 @@ namespace BlogTask.Data.Repositories
             if (!string.IsNullOrEmpty(updateUserQuery.NewLastName))
                 user.LastName = updateUserQuery.NewLastName;
             if (!string.IsNullOrEmpty(updateUserQuery.NewSurName))
-                user.Surname = updateUserQuery.NewSurName;
+                user.SurName = updateUserQuery.NewSurName;
             if (!string.IsNullOrEmpty(updateUserQuery.NewPassword))
                 user.Password = updateUserQuery.NewPassword;
 

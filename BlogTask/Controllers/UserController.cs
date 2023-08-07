@@ -67,7 +67,7 @@ namespace BlogTask.Controllers
                 Login = user.Login,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Surname = user.Surname
+                Surname = user.SurName
             };
 
             return StatusCode(200, resp);

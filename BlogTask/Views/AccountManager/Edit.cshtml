@@ -1,0 +1,17 @@
+﻿@model BlogTask.Models.Account.EditUserVeiwModel;
+
+@{
+    ViewData["Title"] = "Редактирование пользователя";
+}
+
+<div class="form">
+    <h2>Редактирование пользователя</h2>
+    <form method="post" asp-controller="AccountManager" asp-action="Edit">
+        <input type="text" asp-for="Login" placeholder="логин" />
+        <input type="text" asp-for="FirstName" placeholder="имя" />
+        <input type="text" asp-for="LastName" placeholder="фамилия" />
+        <input type="text" asp-for="SurName" placeholder="отчество" />
+        <input type="password" asp-for="Password" placeholder="пароль" />
+        <button>Сохранить</button>        
+    </form>
+</div>
