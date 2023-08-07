@@ -1,0 +1,14 @@
+﻿@model BlogTask.Models.Role.EditViewModel;
+
+@{
+    ViewData["Title"] = "Редактирование роли";
+}
+<div class="main">
+    <div class="form">        
+        <h2>Редактирование роли</h2>
+        <form method="post" asp-controller="Role" asp-action="Edit">           
+            <input type="text" asp-for="Name" placeholder="название">
+            <button>Сохранить</button>
+        </form>
+    </div>
+</div>

@@ -28,5 +28,16 @@ namespace BlogTask.Controllers
         {
             return View();
         }
+
+        /// <summary>
+        /// Вывод формы для редактирования роли
+        /// </summary>
+        /// <returns></returns>
+        [Route("Edit")]
+        [HttpGet]
+        public IActionResult Edit()
+        {
+            return View();
+        }
     }
 }
