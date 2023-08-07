@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BlogTask.Models.Tag
 {
-    public class EditViewModel
+    public class AddViewModel
     {
         [Required(ErrorMessage = "Поле Название обязательно для заполнения")]
         [DataType(DataType.Text)]

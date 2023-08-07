@@ -1,0 +1,14 @@
+﻿@model BlogTask.Models.Tag.EditViewModel;
+
+@{
+    ViewData["Title"] = "Редактирование Тега";
+}
+<div class="main">
+    <div class="form">        
+        <h2>Редактирование тега</h2>
+        <form method="post" asp-controller="Tag" asp-action="Edit">           
+            <input type="text" asp-for="Name" placeholder="название">
+            <button>Сохранить</button>
+        </form>
+    </div>
+</div>
