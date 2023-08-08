@@ -50,5 +50,16 @@ namespace BlogTask.Controllers
         {
             return View("List");
         }
+
+        /// <summary>
+        /// просмотр информации о роли
+        /// </summary>
+        /// <returns></returns>
+        [Route("View")]
+        [HttpGet]
+        public IActionResult ViewList()
+        {
+            return View();
+        }
     }
 }
