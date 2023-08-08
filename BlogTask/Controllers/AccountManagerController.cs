@@ -68,6 +68,23 @@ namespace BlogTask.Controllers
         }
 
         /// <summary>
+        /// Страница по редактированию информации о пользователе
+        /// </summary>
+        /// <returns></returns>
+        [Route("View")]
+        [HttpGet]
+        public async Task<IActionResult> ViewUser()
+        {
+            var user = User;
+
+            //var result = await _userManager.GetUserAsync(user);
+
+            //var editmodel = _mapper.Map<UserEditViewModel>(result);
+
+            return View();
+        }
+
+        /// <summary>
         /// Получить список пользователей
         /// </summary>       
         /// <returns></returns>
