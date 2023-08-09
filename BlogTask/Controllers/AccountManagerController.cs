@@ -22,7 +22,9 @@ namespace BlogTask.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index()
+        [Route("Login")]
+        [HttpGet]
+        public IActionResult Login()
         {
             return View("Login");
         }
@@ -41,7 +43,7 @@ namespace BlogTask.Controllers
             {
                 var user = _mapper.Map<User>(model);
 
-                if (PasswordIsCorrect(user))
+                //if (PasswordIsCorrect(user))
                 {
                     return RedirectToAction("Index", "Home");
                 }
@@ -100,8 +102,8 @@ namespace BlogTask.Controllers
         }
 
 
-
-        public bool PasswordIsCorrect(User user)
+        
+        private bool PasswordIsCorrect(User user)
         {
             var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
 

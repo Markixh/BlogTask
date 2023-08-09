@@ -57,7 +57,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("View")]
         [HttpGet]
-        public IActionResult ViewList()
+        public IActionResult ViewRole()
         {
             return View();
         }
