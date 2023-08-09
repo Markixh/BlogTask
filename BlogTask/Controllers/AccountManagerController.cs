@@ -3,10 +3,15 @@ using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 using BlogTask.Models.Account;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
+using static BlogTask.Contracts.Models.Users.GetUserRequest;
+using System.Security.Claims;
 
 namespace BlogTask.Controllers
 {
@@ -41,15 +46,38 @@ namespace BlogTask.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = _mapper.Map<User>(model);
+                if (String.IsNullOrEmpty(model.Login) ||
+              String.IsNullOrEmpty(model.Password))
+                    return StatusCode(400, "Запрос не корректен!");
 
-                //if (PasswordIsCorrect(user))
+                var user = _mapper.Map<User>(model);
+                if (user is null)
+                    return StatusCode(400, "Пользователь на найден!");
+
+                if (!PasswordIsCorrect(user))
                 {
-                    return RedirectToAction("Index", "Home");
+                    return StatusCode(400, "Введенный пароль не корректен!");
                 }
+
+                var role = user.Role is null ? new Role() { Name = "Пользователь"} : user.Role;
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role.Name)
+                };
+
+                ClaimsIdentity claimsIdentity = new(
+                    claims,
+                    "AddCookies",
+                    ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
             }
 
-            return RedirectToAction("Home", "error");
+            return RedirectToAction("Index", "Home");
         }
 
         /// <summary>
@@ -95,14 +123,24 @@ namespace BlogTask.Controllers
         public async Task<IActionResult> UserList()
         {
             var user = User;
-            
+
 
             //if (result == null) return View("UserListNoButton", model);
             return View("UserList");
         }
 
+        /// <summary>
+        /// Метод, выхода из аккаунта
+        /// </summary>
+        [Route("Logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-        
+            return RedirectToAction("Index", "Home");
+        }
+
         private bool PasswordIsCorrect(User user)
         {
             var repository = _unitOfWork.GetRepository<User>() as UsersRepository;

@@ -149,7 +149,15 @@ namespace BlogTask.Controllers
         [HttpGet]
         public IActionResult List()
         {
-            return View("List");
+            var listArticles = _repository.GetAll().ToList();
+
+            if (listArticles == null) return StatusCode(400, "Статьи отсутствуют!");
+            if (listArticles.Count() == 0) return StatusCode(400, "Статьи отсутствуют!");
+
+            Models.Article.ListViewModel view = new Models.Article.ListViewModel();
+            view.List = _mapper.Map<List<Article>, List<Models.Article.ArticleViewModel>>(listArticles);
+
+            return View("List", view);
         }
 
         /// <summary>

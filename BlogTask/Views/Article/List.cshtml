@@ -2,12 +2,16 @@
 
 @if (Model.List.Count != 0)
 {
-    @foreach (var user in @Model.List)
+    @foreach (var article in @Model.List)
     {
         <div class="card">
-            <h5 class="card-header">Заголовок статьи</h5>
+            <h5 class="card-header">@article.Title</h5>
             <div class="card-body">
-                <span class="badge bg-primary">Теги</span>
+                @foreach (var tag in article.Tags)
+                {
+                    <span class="badge bg-primary" style="display:inline;">@tag.Name</span>
+                }
+                <h6>@article.Text</h6>
             </div>
         </div>
     }

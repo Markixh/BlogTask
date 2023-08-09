@@ -29,6 +29,8 @@ namespace BlogTask
 
             CreateMap<LoginViewModel, User>();
             CreateMap<RegisterViewModel, User>();
+
+            CreateMap<Article, Models.Article.ArticleViewModel>();
         }
     }
 }
