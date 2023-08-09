@@ -61,6 +61,9 @@ namespace BlogTask
 
             var app = builder.Build();
 
+            // обработка ошибок HTTP
+            app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
