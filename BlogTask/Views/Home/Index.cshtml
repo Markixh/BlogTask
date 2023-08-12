@@ -6,17 +6,5 @@
     <div>
         <h1 class="display-4">Welcome</h1>
         <p>Разработка блога новостей</p>
-        @if (User.Identity.IsAuthenticated)
-        {
-            <form asp-controller="AccountManager" asp-action="Logout">
-                <button>Выход</button>
-            </form>
-        }
-        else
-        {
-            <form method="get" asp-controller="AccountManager" asp-action="Login">
-                <button>Вход</button>
-            </form>            
-        }
     </div>
 </div>
