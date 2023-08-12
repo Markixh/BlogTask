@@ -14,6 +14,10 @@
                             <span class="badge bg-primary" style="display:inline;">@tag.Name</span>
                         }
                         <h6>@article.Text</h6>
+                        @if (@article.User.Login is not null)
+                        {
+                            <p class="text-decoration-underline">@article.User.Login</p>
+                        }
                     </div>
                 </div>
             </div>
