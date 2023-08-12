@@ -3,13 +3,25 @@
 @{
     ViewData["Title"] = "Просмотр статьи";
 }
-<div class="min-vh-100 align-items-center">
-    <div class="form">
-        <h2>Название статьи(заголовок)</h2>
-        <span class="badge bg-primary">Теги</span>
-        <div>
-            Текст статьи
-        </div>
 
+@if (Model is not null)
+{
+    <div class="container my-1">
+        <div class="p-1">
+            <div class="card rounded-3">
+                <h5 class="card-header border-0">@Model.Title</h5>
+                <div class="card-body">
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <span class="badge bg-primary" style="display:inline;">@tag.Name</span>
+                    }
+                    <h6>@Model.Text</h6>
+                    @if (@Model.User.Login is not null)
+                    {
+                        <p class="text-decoration-underline">@Model.User.Login</p>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+}

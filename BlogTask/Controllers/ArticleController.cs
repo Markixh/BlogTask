@@ -5,6 +5,7 @@ using BlogTask.Data.Models;
 using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using BlogTask.Models.Article;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogTask.Controllers
@@ -14,11 +15,13 @@ namespace BlogTask.Controllers
     public class ArticleController : Controller
     {
         private readonly ArticlesRepository _repository;
+        private readonly UsersRepository _userRepository;
         private readonly IMapper _mapper;
 
         public ArticleController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _repository = unitOfWork.GetRepository<Article>() as ArticlesRepository;
+            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
         }
 
@@ -166,9 +169,19 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("View")]
         [HttpGet]
-        public IActionResult ViewArticle()
+        public async Task<IActionResult> ViewArticle(Guid guid)
         {
-            return View();
+            var article = await _repository.GetAsync(guid);
+            ArticleViewModel model = new ArticleViewModel();
+
+            if (article is not null)
+            {
+                var user = await _userRepository.GetAsync(article.UserGuid);
+                article.User = user;
+                model = _mapper.Map<Article, ArticleViewModel>(article);
+            }           
+            
+            return View(model);
         }
     }
 }

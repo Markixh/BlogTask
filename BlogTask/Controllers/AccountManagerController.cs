@@ -133,6 +133,7 @@ namespace BlogTask.Controllers
         /// Метод, выхода из аккаунта
         /// </summary>
         [Route("Logout")]
+        [HttpPost]
         [Authorize]
         public async Task<IActionResult> Logout()
         {

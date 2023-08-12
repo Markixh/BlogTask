@@ -1,4 +1,6 @@
-﻿@model BlogTask.Models.Article.ListViewModel;
+﻿@{
+    ViewData["Title"] = "Просмотр списка статей";
+}
 
 @if (Model.List.Count != 0)
 {
@@ -6,8 +8,12 @@
         @foreach (var article in @Model.List)
         {
             <div class="p-1">
+                @{
+                    RouteValueDictionary get = new RouteValueDictionary();
+                    get["guid"] = article.Guid;
+                }
                 <div class="card rounded-3">
-                    <h5 class="card-header border-0">@article.Title</h5>
+                    <h5 class="card-header border-0" cursor="pointer" role="button" onclick="location.href = '@Url.Action("View", get)'">@article.Title</h5>
                     <div class="card-body">
                         @foreach (var tag in article.Tags)
                         {
