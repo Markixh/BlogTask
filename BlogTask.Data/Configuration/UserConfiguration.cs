@@ -13,6 +13,14 @@ namespace BlogTask.Data.Configuration
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.ToTable("Users").HasKey(p => p.Guid);
+
+            builder.HasData(
+            new User[]
+            {
+                new User { Guid = Guid.NewGuid(), FirstName = "Андрей", LastName = "Марков", Login = "Markov", Password = "pass", RoleId = 1},
+                new User { Guid = Guid.NewGuid(), FirstName = "Елена", LastName = "Маркова", Login = "Markova", Password = "pass", RoleId = 2},
+                new User { Guid = Guid.NewGuid(), FirstName = "Ольга", LastName = "Еремеева", Login = "Eremeeva", Password = "pass", RoleId = 3}
+            });
         }
     }
 }

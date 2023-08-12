@@ -1,6 +1,7 @@
 ﻿using BlogTask.Data.Configuration;
 using BlogTask.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace BlogTask.Data
 {
@@ -15,7 +16,7 @@ namespace BlogTask.Data
 
         public BlogContext(DbContextOptions<BlogContext> options) : base(options)
         {
-            //Database.EnsureDeleted();
+            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 
@@ -23,11 +24,11 @@ namespace BlogTask.Data
         {
             base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new RoleConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
             builder.ApplyConfiguration(new ArticleConfiguration());
             builder.ApplyConfiguration(new TagConfiguration());
             builder.ApplyConfiguration(new CommentConfiguration());
-            builder.ApplyConfiguration(new RoleConfiguration());
         }
     }
 }

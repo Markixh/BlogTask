@@ -9,51 +9,6 @@ namespace BlogTask.Data.Repositories
     {
         public UsersRepository(BlogContext db) : base(db)
         {
-            var user = new User()
-            {
-                Guid = Guid.NewGuid(),
-                FirstName = "Андрей",
-                LastName = "Марков",
-                Login = "Andrej",
-                Password = "password",
-                Role = new Role()
-                {
-                    Name = "Администратор"
-                }
-            };
-            
-            CreateAsync(user).Wait();
-            
-
-            user = new User()
-            {
-                Guid = Guid.NewGuid(),
-                FirstName = "Елена",
-                LastName = "Маркова",
-                Login = "Elena",
-                Password = "password",
-                Role = new Role()
-                {
-                    Name = "Модератор"
-                }
-            };
-
-            CreateAsync(user).Wait();
-
-            user = new User()
-            {
-                Guid = Guid.NewGuid(),
-                FirstName = "Пользователь",
-                LastName = "Пользователь",
-                Login = "user",
-                Password = "password",
-                Role = new Role()
-                {
-                    Name = "Пользователь"
-                }
-            };
-
-            CreateAsync(user).Wait();
         }
 
         public User UpdateByUser(User user, UpdateUserQuery updateUserQuery)
