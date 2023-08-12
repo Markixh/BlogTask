@@ -2,17 +2,21 @@
 
 @if (Model.List.Count != 0)
 {
-    @foreach (var article in @Model.List)
-    {
-        <div class="card">
-            <h5 class="card-header">@article.Title</h5>
-            <div class="card-body">
-                @foreach (var tag in article.Tags)
-                {
-                    <span class="badge bg-primary" style="display:inline;">@tag.Name</span>
-                }
-                <h6>@article.Text</h6>
+    <div class="container my-1">
+        @foreach (var article in @Model.List)
+        {
+            <div class="p-1">
+                <div class="card rounded-3">
+                    <h5 class="card-header border-0">@article.Title</h5>
+                    <div class="card-body">
+                        @foreach (var tag in article.Tags)
+                        {
+                            <span class="badge bg-primary" style="display:inline;">@tag.Name</span>
+                        }
+                        <h6>@article.Text</h6>
+                    </div>
+                </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 }

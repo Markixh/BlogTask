@@ -13,7 +13,6 @@ html {
 }
 
 html {
-  position: relative;
   min-height: 100%;
 }
 
@@ -21,12 +20,10 @@ body {
   margin-bottom: 60px;
 }
 
-.container {
-    position: relative;
-    z-index: 1;
-    max-width: 400px;
-    margin: 20px;
+.container {   
+    max-width: 768px;
 }
+
 
 .form button {
     font-family: "Roboto", sans-serif;
