@@ -68,9 +68,9 @@ namespace BlogTask.Controllers
         [Route("Edit")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> EditAsync(int id)
+        public async Task<IActionResult> EditAsync(int guid)
         {
-            var role = await _repository.GetAsync(id);
+            var role = await _repository.GetAsync(guid);
 
             var editRole = _mapper.Map<Role, EditViewModel>(role);
 
@@ -109,9 +109,16 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("View")]
         [HttpGet]
-        public IActionResult ViewRole()
+        public async Task<IActionResult> ViewRoleAsync(int guid)
         {
-            return View();
+            var role = await _repository.GetAsync(guid);
+            RoleViewModel model = new RoleViewModel();
+
+            if (role is not null)
+            {                
+                model = _mapper.Map<Role, RoleViewModel>(role);
+            }
+            return View(model);
         }
     }
 }

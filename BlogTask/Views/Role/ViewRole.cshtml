@@ -1,8 +1,23 @@
-﻿@model BlogTask.Models.Role.RoleViewModel;
-
-@{
+﻿@{
     ViewData["Title"] = "Информация о роли";
 }
 
-<h4 class="center">@Model.Name</h4>
-<h2 class="center">@Model.Description</h2>
+@if (Model is not null)
+{
+    <div class="container my-1">
+        <div class="p-1">
+            <div class="card rounded-3">
+                <h5 class="card-header border-0">@Model.Name</h5>
+                <div class="card-body">
+                    @{
+                        RouteValueDictionary get = new RouteValueDictionary();
+                        get["guid"] = @Model.Id;
+                    }
+                    <h6>@Model.Description</h6>
+
+                    <a href="@Url.Action("Edit", get)">Изменить роль</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
