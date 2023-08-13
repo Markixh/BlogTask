@@ -14,5 +14,7 @@ namespace BlogTask.Models.Article
         [DataType(DataType.Text)]
         [Display(Name = "Контент", Prompt = "Введите текст статьи")]
         public string Text { get; set; }
+
+        public Guid Guid { get; set; }
     }
 }

@@ -13,5 +13,7 @@ namespace BlogTask.Models.Role
         [DataType(DataType.Text)]
         [Display(Name = "Описание", Prompt = "Введите описание роли")]
         public string Description { get; set; }
+
+        public int Id;
     }
 }

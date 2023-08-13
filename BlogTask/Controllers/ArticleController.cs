@@ -189,18 +189,30 @@ namespace BlogTask.Controllers
         [Route("Edit")]
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Edit(AddViewModel model)
+        public async Task<IActionResult> Edit(EditViewModel model)
         {
-            var userName = User.Identity.Name;
-
-            var user = _userRepository.GetByLogin(userName);
+            var editArticle = await _repository.GetAsync(model.Guid);
 
             if (model is null)
                 return StatusCode(400, "Данные не внесены!");
 
-            var newArticle = _mapper.Map<AddViewModel, Article>(model);
-            newArticle.UserGuid = user.Guid;
-            await _repository.CreateAsync(newArticle);
+            bool isUpdate = false;
+
+            if (editArticle.Title != model.Title)
+            {
+                editArticle.Title = model.Title;
+                isUpdate = true;
+            }
+            if (editArticle.Text != model.Text)
+            {
+                editArticle.Text = model.Text;
+                isUpdate = true;
+            }
+
+            if (isUpdate)
+            {
+                await _repository.UpdateAsync(editArticle);
+            }
 
             return List();
         }

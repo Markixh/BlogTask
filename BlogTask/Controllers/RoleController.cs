@@ -78,6 +78,41 @@ namespace BlogTask.Controllers
         }
 
         /// <summary>
+        /// Обработка данных для редактирования роли
+        /// </summary>
+        /// <returns></returns>
+        [Route("Edit")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Edit(EditViewModel model)
+        {
+            var editRole = await _repository.GetAsync(model.Id);
+
+            if (model is null)
+                return StatusCode(400, "Данные не внесены!");
+
+            bool isUpdate = false;
+
+            if (editRole.Name != model.Name)
+            {
+                editRole.Name = model.Name;
+                isUpdate = true;
+            }
+            if (editRole.Description != model.Description)
+            {
+                editRole.Description = model.Description;
+                isUpdate = true;
+            }
+
+            if (isUpdate)
+            {
+                await _repository.UpdateAsync(editRole);
+            }
+
+            return List();
+        }
+
+        /// <summary>
         /// Вывод списка ролей
         /// </summary>
         /// <returns></returns>

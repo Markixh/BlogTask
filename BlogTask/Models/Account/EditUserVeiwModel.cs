@@ -5,6 +5,8 @@ namespace BlogTask.Models.Account
 {
     public class EditUserVeiwModel
     {
+        public Guid Guid { get; set; }
+
         [Required(ErrorMessage = "Поле Имя обязательно для заполнения")]
         [DataType(DataType.Text)]
         [Display(Name = "Имя", Prompt = "Введите имя")]
