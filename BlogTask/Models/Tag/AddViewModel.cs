@@ -9,5 +9,7 @@ namespace BlogTask.Models.Tag
         [DataType(DataType.Text)]
         [Display(Name = "Название", Prompt = "Введите название тега")]
         public string Name { get; set; }
+
+        public Guid Guid { get; set; }
     }
 }

@@ -1,0 +1,18 @@
+﻿@if (Model is not null)
+{
+    ViewData["Title"] = Model.Send;
+
+    @if (User.IsInRole("Модератор"))
+    {
+        <div class="container my-1">
+            <div class="p-1 text-center">
+                <a asp-controller="Tag" asp-action="Add">Добавить тэг</a>
+            </div>
+        </div>
+    }
+}
+else
+{
+    ViewData["Title"] = "Предуприждение!";
+}
+

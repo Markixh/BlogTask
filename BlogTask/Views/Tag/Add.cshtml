@@ -1,11 +1,11 @@
 ﻿@model BlogTask.Models.Tag.AddViewModel;
 
 @{
-    ViewData["Title"] = "Добавление Тега";
+    ViewData["Title"] = "Добавить Тег";
 }
 <div class="main">
     <div class="form">        
-        <h2>Добавление тега</h2>
+        <h2>Добавить тег</h2>
         <form method="post" asp-controller="Tag" asp-action="Add">           
             <input type="text" asp-for="Name" placeholder="название">
             <button>Добавить</button>

@@ -1,14 +1,20 @@
 ﻿@model BlogTask.Models.Tag.ListViewModel;
 
-@if (Model.List.Count != 0)
-{
-    @foreach (var user in @Model.List)
-    {
-        <div class="card">
-            <h5 class="card-header">Название тега</h5>
-            <div class="card-body">                
-                
-            </div>
-        </div>
-    }
-}
+<div class="container my-1">
+    <div class="p-1 text-center">
+
+        @if (Model.List.Count != 0)
+        {
+            @foreach (var tag in @Model.List)
+            {
+                RouteValueDictionary get = new RouteValueDictionary();
+                get["guid"] = tag.Guid;
+                <span class="badge bg-primary" style="display:inline;" cursor="pointer" role="button" onclick="location.href = '@Url.Action("View", get)'">@tag.Name</span>
+            }
+        }
+        @if (User.IsInRole("Модератор"))
+        {
+            <a asp-controller="Tag" asp-action="Add">Добавить тэг</a>
+        }
+    </div>
+</div>

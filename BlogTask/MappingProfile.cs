@@ -31,12 +31,14 @@ namespace BlogTask
             CreateMap<RegisterViewModel, User>();
             CreateMap<Models.Article.AddViewModel, Article>();
             CreateMap<Models.Role.AddViewModel, Role>();
+            CreateMap<Models.Tag.AddViewModel, Tag>();
 
             CreateMap<Article, Models.Article.ArticleViewModel>();
             CreateMap<Article, Models.Article.EditViewModel>();
             CreateMap<Role, Models.Role.RoleViewModel>();
             CreateMap<Role, Models.Role.EditViewModel>();
-            CreateMap<Role, Models.Role.RoleViewModel>();
+            CreateMap<Tag, Models.Tag.TagViewModel>();
+            CreateMap<Tag, Models.Tag.EditViewModel>();
         }
     }
 }
