@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using static BlogTask.Contracts.Models.Users.GetUserRequest;
 using System.Security.Claims;
+using BlogTask.Models;
 
 namespace BlogTask.Controllers
 {
@@ -156,15 +157,27 @@ namespace BlogTask.Controllers
         /// Получить список пользователей
         /// </summary>       
         /// <returns></returns>
-        [Route("UserList")]
+        [Route("List")]
         [HttpGet]
-        public async Task<IActionResult> UserList()
+        public IActionResult List()
         {
-            var user = User;
+            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
 
+            var listUsers = repository.GetAll().ToList();
 
-            //if (result == null) return View("UserListNoButton", model);
-            return View("UserList");
+            if (listUsers == null)
+            {
+                return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
+            }
+            if (listUsers.Count() == 0)
+            {
+                return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
+            }
+
+            ListViewModel view = new ListViewModel();
+            view.UserList = _mapper.Map<List<User>, List<UserViewModel>>(listUsers);
+
+            return View(view);
         }
 
         /// <summary>

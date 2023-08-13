@@ -39,6 +39,8 @@ namespace BlogTask
             CreateMap<Role, Models.Role.EditViewModel>();
             CreateMap<Tag, Models.Tag.TagViewModel>();
             CreateMap<Tag, Models.Tag.EditViewModel>();
+            CreateMap<User, UserViewModel>();
+            CreateMap<User, EditUserVeiwModel>();
         }
     }
 }
