@@ -2,6 +2,8 @@
 using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using BlogTask.Models;
+using BlogTask.Models.Role;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogTask.Controllers
@@ -48,7 +50,22 @@ namespace BlogTask.Controllers
         [HttpGet]
         public IActionResult List()
         {
-            return View("List");
+
+            var listArticles = _repository.GetAll().ToList();
+
+            if (listArticles == null)
+            {
+                return View("Event", new EventViewModel() { Send = "Роли отсутствуют!" });
+            }
+            if (listArticles.Count() == 0)
+            {
+                return View("Event", new EventViewModel() { Send = "Роли отсутствуют!" });
+            }
+
+            ListViewModel view = new ListViewModel();
+            view.List = _mapper.Map<List<Role>, List<RoleViewModel>>(listArticles);
+
+            return View("List", view);
         }
 
         /// <summary>

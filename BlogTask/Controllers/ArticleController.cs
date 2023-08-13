@@ -6,6 +6,7 @@ using BlogTask.Data.Models;
 using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using BlogTask.Models;
 using BlogTask.Models.Article;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

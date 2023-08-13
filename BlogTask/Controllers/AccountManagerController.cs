@@ -93,12 +93,16 @@ namespace BlogTask.Controllers
                     return StatusCode(400, "Введенный пароль не корректен!");
                 }
 
-                var role = user.Role is null ? new Role() { Name = "Пользователь"} : user.Role;
+                var userRepository = _unitOfWork.GetRepository<User>() as UsersRepository;
+                var roleId = userRepository.GetByLogin(user.Login).RoleId;
+
+                var roleRepository = _unitOfWork.GetRepository<Role>() as RolesRepository;
+                var roleName = roleId is null ? "Пользователь" : roleRepository.GetAsync((int)roleId).Result.Name;
 
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role.Name)
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, roleName)
                 };
 
                 ClaimsIdentity claimsIdentity = new(

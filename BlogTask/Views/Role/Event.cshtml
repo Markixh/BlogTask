@@ -1,0 +1,15 @@
+﻿@if (Model is not null)
+{
+    ViewData["Title"] = Model.Send;
+
+    <div class="container my-1">
+        <div class="p-1 text-center">
+            <a asp-controller="Article" asp-action="Add">Добавить роль</a>
+        </div>
+    </div>
+}
+else
+{
+    ViewData["Title"] = "Предуприждение!";
+}
+

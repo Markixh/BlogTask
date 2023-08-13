@@ -1,4 +1,4 @@
-﻿namespace BlogTask.Models.Article
+﻿namespace BlogTask.Models
 {
     public class EventViewModel
     {

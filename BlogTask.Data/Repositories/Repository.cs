@@ -39,6 +39,11 @@ namespace BlogTask.Data.Repositories
             return await Set.FindAsync(id);
         }
 
+        public async Task<T> GetAsync(int id)
+        {
+            return await Set.FindAsync(id);
+        }
+
         public IEnumerable<T> GetAll()
         {
             return Set;

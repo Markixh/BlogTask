@@ -1,13 +1,28 @@
 ﻿@model BlogTask.Models.Role.ListViewModel;
 
-@if (Model.List.Count != 0)
+@{
+    ViewData["Title"] = "Просмотр списка ролей";
+}
+
+@if (User.IsInRole("Администратор"))
 {
-    @foreach (var user in @Model.List)
+
+    @if (Model.List.Count != 0)
     {
-        <div class="card">
-            <h5 class="card-header">Название роли</h5>
-            <div class="card-body">
+        @foreach (var role in @Model.List)
+        {
+            <div class="card">
+                <h5 class="card-header">@role.Name</h5>
+                <div class="card-body">
+                </div>
             </div>
-        </div>
+        }
+
     }
+
+    <a href="Add">Добавить</a>
+}
+else
+{
+    <p>Вы не являетесь администратором!</p>
 }
