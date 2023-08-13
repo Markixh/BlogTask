@@ -24,7 +24,9 @@
                     {
                         <p class="text-decoration-underline">@Model.User.Login</p>
                     }
-                    <a href="@Url.Action("Edit", get)">Создайте аккаунт</a>
+                    <div class="p-1">
+                        <button type="button" class="btn btn-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
+                    </div>
                 </div>
             </div>
         </div>
