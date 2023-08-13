@@ -8,13 +8,13 @@
 
 <div class="login-page">
     <div class="form">
-        <form class="register-form" method="post" asp-controller="Register" asp-action="Register">
+        <form class="register-form" method="post" asp-controller="AccountManager" asp-action="Register">
             <input type="text" asp-for="Login" placeholder="логин" />
             <input type="text" asp-for="FirstName" placeholder="имя" />
             <input type="text" asp-for="LastName" placeholder="фамилия" />
             <input type="password" asp-for="Password" placeholder="пароль" />
             <button>Зарегистрироваться</button>
-            <p class="message">Уже зарегистрирован? <a href="AccountManager">Выполните вход</a></p>
+            <p class="message">Уже зарегистрирован? <a href="Login">Выполните вход</a></p>
         </form>
     </div>
 </div>

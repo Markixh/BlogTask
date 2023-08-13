@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using BlogTask.Contracts.Models.Article;
 using BlogTask.Contracts.Models.Tags;
 using BlogTask.Data.Models;
@@ -145,6 +146,28 @@ namespace BlogTask.Controllers
         }
 
         /// <summary>
+        /// Обработка данных для добавления статьи
+        /// </summary>
+        /// <returns></returns>
+        [Route("Add")]
+        [HttpPost]
+        public async Task<IActionResult> Add(AddViewModel model)
+        {
+            var userName = User.Identity.Name;
+
+            var user = _userRepository.GetByLogin(userName);
+
+            if (model is null)
+                return StatusCode(400, "Данные не внесены!");
+
+            var newArticle = _mapper.Map<AddViewModel, Article>(model);
+            newArticle.UserGuid = user.Guid;
+            await _repository.CreateAsync(newArticle);
+
+            return List();
+        }
+
+        /// <summary>
         /// Вывод списка статей
         /// </summary>
         /// <returns></returns>
@@ -154,11 +177,17 @@ namespace BlogTask.Controllers
         {
             var listArticles = _repository.GetAll().ToList();
 
-            if (listArticles == null) return StatusCode(400, "Статьи отсутствуют!");
-            if (listArticles.Count() == 0) return StatusCode(400, "Статьи отсутствуют!");
+            if (listArticles == null)
+            {
+                return View("Event", new EventViewModel() { Send = "Статьи отсутствуют!"});
+            }
+            if (listArticles.Count() == 0)
+            {
+                return View("Event", new EventViewModel() { Send = "Статьи отсутствуют!" });
+            }
 
-            Models.Article.ListViewModel view = new Models.Article.ListViewModel();
-            view.List = _mapper.Map<List<Article>, List<Models.Article.ArticleViewModel>>(listArticles);
+            ListViewModel view = new ListViewModel();
+            view.List = _mapper.Map<List<Article>, List<ArticleViewModel>>(listArticles);
 
             return View("List", view);
         }

@@ -30,3 +30,8 @@
         }
     </div>
 }
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a href="">Добавить</a>
+}
