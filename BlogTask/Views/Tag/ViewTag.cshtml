@@ -14,7 +14,13 @@
                     get["guid"] = @Model.Guid;
                 }
                 <h5 class="card-header border-0">@Model.Name</h5>
-                <a href="@Url.Action("Edit", get)">Редактировать тег</a>
+
+                @if (User.IsInRole("Модератор"))
+                {
+                    <div class="p-1">
+                        <button type="button" class="btn btn-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
+                    </div>
+                }
             </div>
         </div>
     </div>

@@ -24,10 +24,14 @@
                     @if (@Model.User.Login is not null)
                     {
                         <p class="text-decoration-underline">@Model.User.Login</p>
+
+                        @if (Model.User.Login == User.Identity.Name)
+                        {
+                            <div class="p-1">
+                                <button type="button" class="btn btn-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
+                            </div>
+                        }
                     }
-                    <div class="p-1">
-                        <button type="button" class="btn btn-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
-                    </div>
                 </div>
             </div>
         </div>
