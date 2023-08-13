@@ -77,15 +77,15 @@ namespace BlogTask.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        //[HttpPost]
-        //[Route("")]
-        //public async Task<IActionResult> Add(ArticleRequest request)
-       // {
-       //     var newArticle = _mapper.Map<ArticleRequest, Article>(request);
-       //     await _repository.CreateAsync(newArticle);
-       //
-         //   return StatusCode(200, newArticle);
-       // }
+        [HttpPost]
+        [Route("")]
+        public async Task<IActionResult> Add(ArticleRequest request)
+        {
+            var newArticle = _mapper.Map<ArticleRequest, Article>(request);
+            await _repository.CreateAsync(newArticle);
+       
+            return StatusCode(200, newArticle);
+        }
 
         /// <summary>
         /// Метод для изменения статьи

@@ -30,9 +30,12 @@ namespace BlogTask
             CreateMap<LoginViewModel, User>();
             CreateMap<RegisterViewModel, User>();
             CreateMap<Models.Article.AddViewModel, Article>();
+            CreateMap<Models.Role.AddViewModel, Role>();
 
             CreateMap<Article, Models.Article.ArticleViewModel>();
             CreateMap<Article, Models.Article.EditViewModel>();
+            CreateMap<Role, Models.Role.RoleViewModel>();
+            CreateMap<Role, Models.Role.EditViewModel>();
             CreateMap<Role, Models.Role.RoleViewModel>();
         }
     }

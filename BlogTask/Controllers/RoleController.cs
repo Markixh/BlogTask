@@ -4,7 +4,9 @@ using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 using BlogTask.Models;
 using BlogTask.Models.Role;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace BlogTask.Controllers
 {
@@ -12,11 +14,13 @@ namespace BlogTask.Controllers
     public class RoleController : Controller
     {
         private readonly RolesRepository _repository;
+        private readonly UsersRepository _userRepository;
         private readonly IMapper _mapper;
 
         public RoleController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _repository = unitOfWork.GetRepository<Role>() as RolesRepository;
+            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
         }
 
@@ -32,14 +36,45 @@ namespace BlogTask.Controllers
         }
 
         /// <summary>
+        /// Обработка данных для добавления роли
+        /// </summary>
+        /// <returns></returns>
+        [Route("Add")]
+        [HttpPost]
+        [Authorize]        
+        public async Task<IActionResult> Add(AddViewModel model)
+        {
+            var userName = User.Identity.Name;
+
+            var user = _userRepository.GetByLogin(userName);
+
+            if (model is null)
+                return StatusCode(400, "Данные не внесены!");
+
+            if (user.RoleId != 1)
+                return StatusCode(400, "Отсутствует необходимая роль!");
+
+            var newRole = _mapper.Map<AddViewModel, Role>(model);
+            
+            await _repository.CreateAsync(newRole);
+
+            return List();
+        }
+
+        /// <summary>
         /// Вывод формы для редактирования роли
         /// </summary>
         /// <returns></returns>
         [Route("Edit")]
         [HttpGet]
-        public IActionResult Edit()
+        [Authorize]
+        public async Task<IActionResult> EditAsync(int id)
         {
-            return View();
+            var role = await _repository.GetAsync(id);
+
+            var editRole = _mapper.Map<Role, EditViewModel>(role);
+
+            return View(editRole);
         }
 
         /// <summary>

@@ -18,9 +18,9 @@ namespace BlogTask.Data.Configuration
             builder.HasData(
             new Role[]
             {
-                new Role { Id = 1, Name = "Администратор"},
-                new Role { Id = 2, Name = "Модератор" },
-                new Role { Id = 3, Name = "Пользователь" }
+                new Role { Id = 1, Name = "Администратор", Description = "Роль дает возможность присваивать роли пользователям, так же создавать новые роли"},
+                new Role { Id = 2, Name = "Модератор", Description = "Роль дает возможность вносить изменения во все статьи и коментарии" },
+                new Role { Id = 3, Name = "Пользователь", Description = "Обычный пользователь без привилегий" }
             });
         }
     }

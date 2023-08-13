@@ -9,5 +9,9 @@ namespace BlogTask.Models.Role
         [DataType(DataType.Text)]
         [Display(Name = "Название", Prompt = "Введите название роли")]
         public string Name { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Описание", Prompt = "Введите описание роли")]
+        public string Description { get; set; }
     }
 }

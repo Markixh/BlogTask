@@ -11,9 +11,14 @@
     {
         @foreach (var role in @Model.List)
         {
+
+            RouteValueDictionary get = new RouteValueDictionary();
+            get["id"] = role.Id;
+
             <div class="card">
-                <h5 class="card-header">@role.Name</h5>
+                <h5 class="card-header" cursor="pointer" role="button" onclick="location.href = '@Url.Action("View", get)'">@role.Name</h5>
                 <div class="card-body">
+                    <p>@role.Description</p>
                 </div>
             </div>
         }

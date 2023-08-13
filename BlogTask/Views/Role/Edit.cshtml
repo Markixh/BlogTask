@@ -8,6 +8,7 @@
         <h2>Редактирование роли</h2>
         <form method="post" asp-controller="Role" asp-action="Edit">           
             <input type="text" asp-for="Name" placeholder="название">
+            <textarea type="text" asp-for="Description" placeholder="описание"></textarea>
             <button>Сохранить</button>
         </form>
     </div>
