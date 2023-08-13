@@ -7,11 +7,11 @@ using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 using BlogTask.Models.Article;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogTask.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
     public class ArticleController : Controller
     {
@@ -76,19 +76,15 @@ namespace BlogTask.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
-        public async Task<IActionResult> Add(ArticleRequest request)
-        {
-            var article = await _repository.GetAsync(request.Guid);
-            if (article != null)
-                return StatusCode(400, "Такая статья уже существует!");
-
-            var newArticle = _mapper.Map<ArticleRequest, Article>(request);
-            await _repository.CreateAsync(newArticle);
-
-            return StatusCode(200, newArticle);
-        }
+        //[HttpPost]
+        //[Route("")]
+        //public async Task<IActionResult> Add(ArticleRequest request)
+       // {
+       //     var newArticle = _mapper.Map<ArticleRequest, Article>(request);
+       //     await _repository.CreateAsync(newArticle);
+       //
+         //   return StatusCode(200, newArticle);
+       // }
 
         /// <summary>
         /// Метод для изменения статьи
@@ -140,6 +136,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("Add")]
         [HttpGet]
+        [Authorize]
         public IActionResult Add()
         {
             return View();
@@ -151,7 +148,47 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("Add")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Add(AddViewModel model)
+        {
+            var userName = User.Identity.Name;
+
+            var user = _userRepository.GetByLogin(userName);
+
+            if (model is null)
+                return StatusCode(400, "Данные не внесены!");
+
+            var newArticle = _mapper.Map<AddViewModel, Article>(model);
+            newArticle.UserGuid = user.Guid;
+            await _repository.CreateAsync(newArticle);
+
+            return List();
+        }
+
+        /// <summary>
+        /// Вывод формы для добавления статьи
+        /// </summary>
+        /// <returns></returns>
+        [Route("Edit")]
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Edit(Guid guid)
+        {
+            var article = await _repository.GetAsync(guid);
+
+            var editArticle = _mapper.Map<Article, EditViewModel>(article);
+
+            return View(editArticle);
+        }
+
+        /// <summary>
+        /// Обработка данных для редактирования статьи
+        /// </summary>
+        /// <returns></returns>
+        [Route("Edit")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Edit(AddViewModel model)
         {
             var userName = User.Identity.Name;
 

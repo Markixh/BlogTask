@@ -32,6 +32,7 @@ namespace BlogTask
             CreateMap<Models.Article.AddViewModel, Article>();
 
             CreateMap<Article, Models.Article.ArticleViewModel>();
+            CreateMap<Article, Models.Article.EditViewModel>();
         }
     }
 }

@@ -11,6 +11,10 @@
             <div class="card rounded-3">
                 <h5 class="card-header border-0">@Model.Title</h5>
                 <div class="card-body">
+                    @{
+                        RouteValueDictionary get = new RouteValueDictionary();
+                        get["guid"] = @Model.Guid;
+                    }
                     @foreach (var tag in Model.Tags)
                     {
                         <span class="badge bg-primary" style="display:inline;">@tag.Name</span>
@@ -20,6 +24,7 @@
                     {
                         <p class="text-decoration-underline">@Model.User.Login</p>
                     }
+                    <a href="@Url.Action("Edit", get)">Создайте аккаунт</a>
                 </div>
             </div>
         </div>

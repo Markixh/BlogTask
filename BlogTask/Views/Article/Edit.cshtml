@@ -1,15 +1,27 @@
-﻿@model BlogTask.Models.Article.AddViewModel;
+﻿@model BlogTask.Models.Article.EditViewModel;
 
 @{
-    ViewData["Title"] = "Добавление статьи";
+    ViewData["Title"] = "Изменение статьи";
 }
-<div class="main">
-    <div class="form">        
-        <h2>Добавление статьи</h2>
-        <form method="post" asp-controller="Article" asp-action="Add">           
-            <input type="text" asp-for="Title" placeholder="заголовок">
-            <textarea type="text" asp-for="Text" rows="5" placeholder="контекст"></textarea>
-            <button>Добавить</button>
-        </form>
+
+@if (Model is not null)
+{
+    <div class="container my-1">
+        <div class="p-1">
+
+            <h3>Изменить статью</h3>
+
+            <form method="post" asp-controller="Article" asp-action="Edit">
+                <div class="mb-3">
+                    <label for="Title" class="form-label">Заголовок</label>
+                    <input type="text" asp-for="Title" class="form-control" id="Title">
+                </div>
+                <div class="mb-3">
+                    <label for="InputText" class="form-label">Текст статьи</label>
+                    <textarea type="text" asp-for="Text" class="form-control" id="InputText"> </textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить</button>
+            </form>
+        </div>
     </div>
-</div>
+}
