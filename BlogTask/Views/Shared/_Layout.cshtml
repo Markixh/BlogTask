@@ -38,7 +38,8 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <form asp-controller="AccountManager" asp-action="Logout">
-                            <button class="btn btn-outline-success">Выход</button>
+                            <label for="Exit" class="form-label text-white">@User.Identity.Name</label>
+                            <button class="btn btn-outline-success" id="Exit">Выход</button>
                         </form>
                     }
                     else
