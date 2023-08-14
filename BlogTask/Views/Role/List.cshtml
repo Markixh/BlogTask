@@ -25,8 +25,12 @@
         }
 
     }
-
-    <a href="Add">Добавить</a>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="p-1">
+            <button type="button" class="btn btn-success" onclick="window.location='@Url.Action("Add", "Role")'">Добавить</button>
+        </div>
+    }
 }
 else
 {
