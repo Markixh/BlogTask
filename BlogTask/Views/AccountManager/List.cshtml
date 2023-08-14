@@ -2,14 +2,27 @@
 
 @if (Model.UserList.Count != 0)
 {
-    @foreach (var user in @Model.UserList)
-    {
-        <div class="card">
-            <h5 class="card-header">Имя пользователя</h5>
-            <div class="card-body">
-                <h5 class="card-title">Special title treatment</h5>
-                <span class="badge bg-primary">Роли</span>
+    <div class="container my-1">
+        <h3>Просмотр списка пользователей</h3>
+
+        @foreach (var user in @Model.UserList)
+        {
+            <div class="p-1">
+                @{
+                    RouteValueDictionary get = new RouteValueDictionary();
+                    get["guid"] = user.Guid;
+                }
+                <div class="card rounded-3">
+                    <h5 class="card-header border-0" cursor="pointer" role="button" onclick="location.href = '@Url.Action("View", get)'">@user.Login</h5>
+                    <div class="card-body">
+                        <h6>@user.GetFullName()</h6>
+                        @if (user.Role is not null)
+                        {
+                            <span class="badge bg-primary">@user.Role.Name</span>
+                        }
+                    </div>
+                </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 }

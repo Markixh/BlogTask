@@ -159,9 +159,10 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("List")]
         [HttpGet]
-        public IActionResult List()
+        public async Task<IActionResult> ListAsync()
         {
             var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
+            var repositoryRole = _unitOfWork.GetRepository<Role>() as RolesRepository;
 
             var listUsers = repository.GetAll().ToList();
 
@@ -172,6 +173,16 @@ namespace BlogTask.Controllers
             if (listUsers.Count() == 0)
             {
                 return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
+            }
+
+            foreach(var user in listUsers) 
+            {
+                var role = await repositoryRole.GetAsync((int)user.RoleId);
+
+                if (role != null)
+                {
+                    user.Role = role;
+                }                
             }
 
             ListViewModel view = new ListViewModel();
