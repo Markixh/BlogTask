@@ -9,35 +9,34 @@
 
     <h4 class="center">@Model.Login</h4>
 
-    <div class="row">
-
-        <div class="main">           
-            <div class="center-align">
-                <form method="get" asp-controller="AccountManager" asp-action="Edit">
-                    <input class="enter_submit" type="submit" value="Редактировать" />
-                </form>
-            </div>
+    <div class="main">
+        <div class="center-align">
+            <form method="get" asp-controller="AccountManager" asp-action="Edit">
+                <input class="enter_submit" type="submit" value="Редактировать" />
+            </form>
         </div>
+    </div>
 
 
-        <div class="side">
-            <div class="lined-block">                
+    <div class="side">
+        <div class="lined-block">
 
-                <div>
-                    <label class="gray-text">Имя</label>
-                    <label> @Model.FirstName</label>
-                </div>
-
-                <div>
-                    <label class="gray-text">Фамилия</label>
-                    <label> @Model.LastName</label>
-                </div>
-
-                <div>
-                    <label class="gray-text">Отчество</label>
-                    <label> @Model.SurName</label>
-                </div>
-
+            <div>
+                <label class="gray-text">Имя</label>
+                <label> @Model.FirstName</label>
             </div>
-       
+
+            <div>
+                <label class="gray-text">Фамилия</label>
+                <label> @Model.LastName</label>
+            </div>
+
+            <div>
+                <label class="gray-text">Отчество</label>
+                <label> @Model.SurName</label>
+            </div>
+
+        </div>
+    </div>
+
 </div>
