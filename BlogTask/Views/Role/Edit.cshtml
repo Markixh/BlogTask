@@ -5,13 +5,23 @@
 }
 @if (Model is not null)
 {
-    <div class="form">
-        <h2>Редактирование роли</h2>
-        <form method="post" asp-controller="Role" asp-action="Edit">
-            <input type="text" asp-for="Name" placeholder="название">
-            <textarea type="text" asp-for="Description" placeholder="описание"></textarea>
-            <input type="text" asp-for="Id" hidden />
-            <button>Сохранить</button>
-        </form>
+    <div class="container my-1">
+        <div class="p-1">
+
+            <h3>Изменить роль</h3>
+
+            <form method="post" asp-controller="Role" asp-action="Edit">
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Название</label>
+                    <input type="text" asp-for="Name" class="form-control" id="Name">
+                </div>
+                <div class="mb-3">
+                    <label for="Description" class="form-label">Описание роли</label>
+                    <textarea type="text" asp-for="Description" class="form-control" id="Description"> </textarea>
+                </div>
+                <input type="text" asp-for="Id" hidden />
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </form>
+        </div>
     </div>
 }
