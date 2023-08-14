@@ -15,7 +15,12 @@
                     }
                     <h6>@Model.Description</h6>
 
-                    <a href="@Url.Action("Edit", get)">Изменить роль</a>
+                    @if (User.IsInRole("Администратор"))
+                    {
+                        <div class="p-1">
+                            <button type="button" class="btn btn-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
