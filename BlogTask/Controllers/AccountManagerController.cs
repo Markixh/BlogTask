@@ -142,15 +142,26 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("View")]
         [HttpGet]
-        public async Task<IActionResult> ViewUser()
+        public async Task<IActionResult> ViewUser(Guid guid)
         {
-            var user = User;
+            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
+            var repositoryRole = _unitOfWork.GetRepository<Role>() as RolesRepository;
 
-            //var result = await _userManager.GetUserAsync(user);
+            var user = await repository.GetAsync(guid);
+            UserViewModel model = new UserViewModel();
 
-            //var editmodel = _mapper.Map<UserEditViewModel>(result);
+            if (user is not null)
+            {
+                model = _mapper.Map<User, UserViewModel>(user);
+                var role = await repositoryRole.GetAsync((int)user.RoleId);
 
-            return View();
+                if (role != null)
+                {
+                    model.Role = role;
+                }
+            }
+
+            return View(model);
         }
 
         /// <summary>

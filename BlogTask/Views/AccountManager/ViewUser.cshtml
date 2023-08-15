@@ -4,39 +4,35 @@
     ViewData["Title"] = "Информация о пользователе";
 }
 
-<div class="form">
-    <h2>Информация о пользователе</h2>
+@if (Model is not null)
+{
+    <div class="container my-1">
+        <h3>Информация о пользователе</h3>
+        <div class="p-1">
+            <div class="card rounded-3">
+                <h5 class="card-header border-0">@Model.GetFullName()</h5>
+                <div class="card-body">
+                    @{
+                        RouteValueDictionary get = new RouteValueDictionary();
+                        get["guid"] = @Model.Guid;
+                    }
 
-    <h4 class="center">@Model.Login</h4>
+                    <span class="badge bg-primary" style="display:inline;">@Model.Role.Name</span>
 
-    <div class="main">
-        <div class="center-align">
-            <form method="get" asp-controller="AccountManager" asp-action="Edit">
-                <input class="enter_submit" type="submit" value="Редактировать" />
-            </form>
+                    
+                    @if (@Model is not null)
+                    {
+                        <p class="text-decoration-underline">@Model.Login</p>
+
+                        @if (Model.Login == User.Identity.Name)
+                        {
+                            <div class="p-1">
+                                <button type="button" class="btn btn-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
         </div>
     </div>
-
-
-    <div class="side">
-        <div class="lined-block">
-
-            <div>
-                <label class="gray-text">Имя</label>
-                <label> @Model.FirstName</label>
-            </div>
-
-            <div>
-                <label class="gray-text">Фамилия</label>
-                <label> @Model.LastName</label>
-            </div>
-
-            <div>
-                <label class="gray-text">Отчество</label>
-                <label> @Model.SurName</label>
-            </div>
-
-        </div>
-    </div>
-
-</div>
+}
