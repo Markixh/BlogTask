@@ -3,12 +3,17 @@
 @{
     ViewData["Title"] = "Добавить Тег";
 }
-<div class="main">
-    <div class="form">        
-        <h2>Добавить тег</h2>
-        <form method="post" asp-controller="Tag" asp-action="Add">           
-            <input type="text" asp-for="Name" placeholder="название">
-            <button>Добавить</button>
+<div class="container my-1">
+    <div class="p-1">
+
+        <h3>Добавить Тег</h3>
+
+        <form method="post" asp-controller="Tag" asp-action="Add">
+            <div class="mb-3">
+                <label for="Title" class="form-label">Название тега</label>
+                <input type="text" asp-for="Name" class="form-control" id="Title">
+            </div>
+            <button type="submit" class="btn btn-success">Добавить</button>
         </form>
     </div>
 </div>
