@@ -9,11 +9,12 @@
 
     @if (Model.List.Count != 0)
     {
+        <h3 class="text-center">Просмотр списка ролей</h3>
         @foreach (var role in @Model.List)
         {
             RouteValueDictionary get = new RouteValueDictionary();
             get["guid"] = role.Id.ToString();
-
+            
             <div class="p-1">
                 <div class="card">
                     <h5 class="card-header" cursor="pointer" role="button" onclick="location.href = '@Url.Action("View", get)'">@role.Name</h5>
