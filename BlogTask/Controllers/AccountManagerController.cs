@@ -165,6 +165,37 @@ namespace BlogTask.Controllers
         }
 
         /// <summary>
+        /// Страница информации о текущем пользователе
+        /// </summary>
+        /// <returns></returns>
+        [Route("Profile")]
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
+            var repositoryRole = _unitOfWork.GetRepository<Role>() as RolesRepository;
+
+            var login = User.Identity.Name;
+
+            var user = repository.GetByLogin(login);
+
+            UserViewModel model = new UserViewModel();
+
+            if (user is not null)
+            {
+                model = _mapper.Map<User, UserViewModel>(user);
+                var role = await repositoryRole.GetAsync((int)user.RoleId);
+
+                if (role != null)
+                {
+                    model.Role = role;
+                }
+            }
+
+            return View("ViewUser", model);
+        }
+
+        /// <summary>
         /// Получить список пользователей
         /// </summary>       
         /// <returns></returns>
@@ -186,14 +217,14 @@ namespace BlogTask.Controllers
                 return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
             }
 
-            foreach(var user in listUsers) 
+            foreach (var user in listUsers)
             {
                 var role = await repositoryRole.GetAsync((int)user.RoleId);
 
                 if (role != null)
                 {
                     user.Role = role;
-                }                
+                }
             }
 
             ListViewModel view = new ListViewModel();

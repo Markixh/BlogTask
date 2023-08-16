@@ -40,8 +40,13 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <form asp-controller="AccountManager" asp-action="Logout">
-                            <label for="Exit" class="form-label text-white">@User.Identity.Name</label>
-                            <button class="btn btn-outline-success" id="Exit">Выход</button>
+                            <ul class="navbar-nav flex-grow-1 justify-content-center">
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-area="" asp-controller="AccountManager" asp-action="Profile">@User.Identity.Name</a>
+                                </li>
+
+                                <button class="btn btn-outline-success" id="Exit">Выход</button>
+                            </ul>
                         </form>
                     }
                     else
