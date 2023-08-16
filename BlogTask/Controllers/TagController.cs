@@ -252,5 +252,23 @@ namespace BlogTask.Controllers
 
             return View(model);
         }
+
+        /// <summary>
+        /// Метод для удаления тега
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Del")]
+        public async Task<IActionResult> Del(Guid guid)
+        {
+            var tag = _repository.GetAsync(guid);
+            if (tag == null)
+                return StatusCode(400, "Тэг не найден!");
+
+            await _repository.DeleteAsync(await tag);
+
+            return List();
+        }
     }
 }

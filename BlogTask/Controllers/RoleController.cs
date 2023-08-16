@@ -155,5 +155,23 @@ namespace BlogTask.Controllers
             }
             return View(model);
         }
+
+        /// <summary>
+        /// Метод для удаления роли
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Del")]
+        public async Task<IActionResult> Del(int guid)
+        {
+            var role = _repository.GetAsync(guid);
+            if (role == null)
+                return StatusCode(400, "Роль не найдена!");
+
+            await _repository.DeleteAsync(await role);
+
+            return List();
+        }
     }
 }
