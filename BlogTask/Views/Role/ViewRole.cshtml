@@ -19,7 +19,9 @@
                     @if (User.IsInRole("Администратор"))
                     {
                         <div class="p-1">
-                            <button type="button" class="btn btn-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="window.location='@Url.Action("Edit", get)'">Редактировать</button>
+                        
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="window.location='@Url.Action("Delete", get)'">Удалить</button>
                         </div>
                     }
                 </div>

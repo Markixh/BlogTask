@@ -1,5 +1,9 @@
 ﻿@model BlogTask.Models.Account.ListViewModel;
 
+@{
+    ViewData["Title"] = "Просмотр списка пользователей";
+}
+
 @if (Model.UserList.Count != 0)
 {
     <div class="container my-1">
