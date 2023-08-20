@@ -3,10 +3,14 @@
 @{
     ViewData["Title"] = "Редактирование Тега";
 }
+
+<partial name="_ValidationScriptsPartial" />
+
 <div class="main">
     <div class="form">        
         <h2>Редактирование тега</h2>
-        <form method="post" asp-controller="Tag" asp-action="Edit">           
+        <form method="post" asp-controller="Tag" asp-action="Edit">    
+            <span asp-validation-for="Name" class="text-danger"></span>
             <input type="text" asp-for="Name" placeholder="название">
             <input type="text" asp-for="Guid" hidden />
             <button>Сохранить</button>

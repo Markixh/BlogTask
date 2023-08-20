@@ -167,11 +167,18 @@ namespace BlogTask.Controllers
             if (user.RoleId != 2)
                 return StatusCode(400, "Отсутствует необходимая роль!");
 
-            var newRole = _mapper.Map<AddViewModel, Tag>(model);
+            if (ModelState.IsValid)
+            {
+                var newRole = _mapper.Map<AddViewModel, Tag>(model);
 
-            await _repository.CreateAsync(newRole);
+                await _repository.CreateAsync(newRole);
 
-            return List();
+                return List();
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         /// <summary>
@@ -204,13 +211,20 @@ namespace BlogTask.Controllers
             if (model is null)
                 return StatusCode(400, "Данные не внесены!");
 
-            if (editTag.Name != model.Name)
-            {   
-                editTag.Name = model.Name;
-                await _repository.UpdateAsync(editTag);
-            }
+            if (ModelState.IsValid)
+            {
+                if (editTag.Name != model.Name)
+                {
+                    editTag.Name = model.Name;
+                    await _repository.UpdateAsync(editTag);
+                }
 
-            return List();
+                return List();
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         /// <summary>
