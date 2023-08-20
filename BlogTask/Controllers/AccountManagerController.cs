@@ -113,10 +113,12 @@ namespace BlogTask.Controllers
                     ClaimsIdentity.DefaultRoleClaimType);
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
+                return RedirectToAction("Index", "Home");
             }
-
-            return View("Login", model);
+            else
+            {
+                return View("Login", model);
+            }
         }
 
         /// <summary>
@@ -126,15 +128,66 @@ namespace BlogTask.Controllers
         [Route("Edit")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Edit()
+        public async Task<IActionResult> Edit(Guid guid)
         {
-            var user = User;
+            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
 
-            //var result = await _userManager.GetUserAsync(user);
+            var user = await repository.GetAsync(guid);
 
-            //var editmodel = _mapper.Map<UserEditViewModel>(result);
+            var editUser = _mapper.Map<User, EditUserVeiwModel>(user);
 
-            return View("Edit");
+            return View("Edit", editUser);
+        }
+
+        /// <summary>
+        /// Обработка результата редактирования пользователя
+        /// </summary>
+        /// <returns></returns>
+        [Route("Edit")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Edit(EditUserVeiwModel model)
+        {
+            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
+            var editUser = await repository.GetAsync(model.Guid);
+
+            if (model is null)
+                return StatusCode(400, "Данные не внесены!");
+
+            bool isUpdate = false;
+
+            if (editUser.Login != model.Login)
+            {
+                editUser.Login = model.Login;
+                isUpdate = true;
+            }
+            if (editUser.FirstName != model.FirstName)
+            {
+                editUser.FirstName = model.FirstName;
+                isUpdate = true;
+            }
+            if (editUser.LastName != model.LastName)
+            {
+                editUser.LastName = model.LastName;
+                isUpdate = true;
+            }
+            if (editUser.SurName != model.SurName)
+            {
+                editUser.SurName = model.SurName;
+                isUpdate = true;
+            }
+            if (editUser.Password != model.Password)
+            {
+                editUser.Password = model.Password;
+                isUpdate = true;
+            }
+
+            if (isUpdate)
+            {
+                await repository.UpdateAsync(editUser);
+            }
+
+            return await ListAsync();
         }
 
         /// <summary>
@@ -232,7 +285,7 @@ namespace BlogTask.Controllers
             ListViewModel view = new ListViewModel();
             view.UserList = _mapper.Map<List<User>, List<UserViewModel>>(listUsers);
 
-            return View(view);
+            return View("List", view);
         }
 
         /// <summary>
