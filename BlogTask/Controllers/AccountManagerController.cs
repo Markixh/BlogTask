@@ -54,10 +54,10 @@ namespace BlogTask.Controllers
 
                 var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
 
-                var findUser = repository.GetByLogin(user.Login);
+                var findUser = repository?.GetByLogin(user.Login);
                 if (findUser is not null) { return View("Register"); }
 
-                await repository.CreateAsync(user);
+                if (repository is not null) { await repository.CreateAsync(user); }
             }
             return View("Register", model);
         }
@@ -95,10 +95,11 @@ namespace BlogTask.Controllers
                 }
 
                 var userRepository = _unitOfWork.GetRepository<User>() as UsersRepository;
-                var roleId = userRepository.GetByLogin(user.Login).RoleId;
+                var roleId = userRepository?.GetByLogin(user.Login).RoleId;
 
                 var roleRepository = _unitOfWork.GetRepository<Role>() as RolesRepository;
-                var roleName = roleId is null ? "Пользователь" : roleRepository.GetAsync((int)roleId).Result.Name;
+                var roleName = roleId is null ? "Пользователь" : roleRepository?.GetAsync((int)roleId).Result.Name;
+                roleName = roleName is null ? "Пользователь" : roleName;
 
                 var claims = new List<Claim>
                 {
