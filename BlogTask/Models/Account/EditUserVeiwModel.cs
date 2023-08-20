@@ -16,10 +16,9 @@ namespace BlogTask.Models.Account
         [DataType(DataType.Text)]
         [Display(Name = "Фамилия", Prompt = "Введите фамилию")]
         public string LastName { get; set; }
-                
-        [DataType(DataType.Text)]
+        
         [Display(Name = "Отчество", Prompt = "Введите отчество")]
-        public string SurName { get; set; }
+        public string? SurName { get; set; }
 
         [Required(ErrorMessage = "Поле Логин обязательно для заполнения")]
         [DataType(DataType.Text)]

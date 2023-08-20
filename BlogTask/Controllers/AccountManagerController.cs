@@ -151,43 +151,47 @@ namespace BlogTask.Controllers
             var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
             var editUser = await repository.GetAsync(model.Guid);
 
-            if (model is null)
-                return StatusCode(400, "Данные не внесены!");
+            if (ModelState.IsValid)
+            {
 
-            bool isUpdate = false;
+                bool isUpdate = false;
 
-            if (editUser.Login != model.Login)
-            {
-                editUser.Login = model.Login;
-                isUpdate = true;
-            }
-            if (editUser.FirstName != model.FirstName)
-            {
-                editUser.FirstName = model.FirstName;
-                isUpdate = true;
-            }
-            if (editUser.LastName != model.LastName)
-            {
-                editUser.LastName = model.LastName;
-                isUpdate = true;
-            }
-            if (editUser.SurName != model.SurName)
-            {
-                editUser.SurName = model.SurName;
-                isUpdate = true;
-            }
-            if (editUser.Password != model.Password)
-            {
-                editUser.Password = model.Password;
-                isUpdate = true;
-            }
+                if (editUser.Login != model.Login)
+                {
+                    editUser.Login = model.Login;
+                    isUpdate = true;
+                }
+                if (editUser.FirstName != model.FirstName)
+                {
+                    editUser.FirstName = model.FirstName;
+                    isUpdate = true;
+                }
+                if (editUser.LastName != model.LastName)
+                {
+                    editUser.LastName = model.LastName;
+                    isUpdate = true;
+                }
+                if (editUser.SurName != model.SurName)
+                {
+                    editUser.SurName = model.SurName is null ? "" : model.SurName;
+                    isUpdate = true;
+                }
+                if (editUser.Password != model.Password)
+                {
+                    editUser.Password = model.Password;
+                    isUpdate = true;
+                }
 
-            if (isUpdate)
-            {
-                await repository.UpdateAsync(editUser);
+                if (isUpdate)
+                {
+                    await repository.UpdateAsync(editUser);
+                }
+                return await ListAsync();
             }
-
-            return await ListAsync();
+            else
+            {
+                return View("Edit", model);
+            }
         }
 
         /// <summary>

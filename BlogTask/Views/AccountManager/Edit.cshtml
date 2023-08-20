@@ -16,22 +16,27 @@
             <form method="post" asp-controller="AccountManager" asp-action="Edit">
                 <div class="mb-3">
                     <label for="Title" class="form-label">Логин</label>
+                    <span asp-validation-for="Login" class="text-danger"></span>
                     <input type="text" asp-for="Login" class="form-control" id="Title">
                 </div>
                 <div class="mb-3">
                     <label for="FirstName" class="form-label">Имя</label>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
                     <textarea type="text" asp-for="FirstName" class="form-control" id="FirstName"> </textarea>
                 </div>
                 <div class="mb-3">
                     <label for="LastName" class="form-label">Фамилия</label>
+                    <span asp-validation-for="LastName" class="text-danger"></span>
                     <textarea type="text" asp-for="LastName" class="form-control" id="InpLastNameutText"> </textarea>
                 </div>
                 <div class="mb-3">
                     <label for="SurName" class="form-label">Отчество</label>
+                    <span asp-validation-for="SurName" class="text-danger"></span>
                     <textarea type="text" asp-for="SurName" class="form-control" id="SurName"> </textarea>
                 </div>
                 <div class="mb-3">
                     <label for="Password" class="form-label">Пароль</label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
                     <input type="password" asp-for="Password" class="form-control" id="Password">
                 </div>
                 <input type="text" asp-for="Guid" hidden />
