@@ -105,3 +105,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+.alert {
+    padding: 0em 1em;
+}

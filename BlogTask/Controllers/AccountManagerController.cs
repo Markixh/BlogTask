@@ -59,7 +59,7 @@ namespace BlogTask.Controllers
 
                 await repository.CreateAsync(user);
             }
-            return View("Login");
+            return View("Register", model);
         }
 
         [Route("Login")]

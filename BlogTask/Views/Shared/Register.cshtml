@@ -12,9 +12,33 @@
             <input type="text" asp-for="Login" placeholder="логин" />
             <input type="text" asp-for="FirstName" placeholder="имя" />
             <input type="text" asp-for="LastName" placeholder="фамилия" />
-            <input type="password" asp-for="Password" placeholder="пароль" />
-            <button>Зарегистрироваться</button>
+
+            <div class="alert alert-warning" role="alert" for="Password" hidden id="Message">
+                Пароли не совпадают!
+            </div>
+            <input type="password" asp-for="Password" placeholder="пароль" id="Password" oninput="MatchPassword()" />
+            <input type="password" asp-for="PasswordConfirm" placeholder="повторите пароль" id="PasswordConfirm" oninput="MatchPassword()" />
+            <button id="Reg">Зарегистрироваться</button>
             <p class="message">Уже зарегистрирован? <a href="Login">Выполните вход</a></p>
         </form>
     </div>
+    <script type="text/javascript">
+        function MatchPassword() {
+            var pass = document.getElementById("Password");
+            var passConf = document.getElementById("PasswordConfirm");
+            var reg = document.getElementById("Reg");
+            var message = document.getElementById("Message");
+                       
+            if (pass.value != passConf.value) {
+                reg.removeAttribute('enabled');
+                reg.setAttribute('disabled', 'disabled');
+                message.hidden = false;
+            }
+            else { 
+                reg.removeAttribute('disabled');
+                reg.setAttribute('enabled', 'enabled');
+                message.hidden = true;
+            }
+        }
+    </script>
 </div>
