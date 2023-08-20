@@ -79,6 +79,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Add(ArticleRequest request)
         {
             var newArticle = _mapper.Map<ArticleRequest, Article>(request);
@@ -94,6 +95,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpPatch]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Update([FromBody] EditArticleRequest request)
         {
             var article = await _repository.GetAsync(request.Guid);
@@ -120,6 +122,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid guid)
         {
             var article = await _repository.GetAsync(guid);
@@ -257,7 +260,7 @@ namespace BlogTask.Controllers
             {
                 var user = await _userRepository.GetAsync(article.UserGuid);
                 article.User = user;
-                model = _mapper.Map<Article, ArticleViewModel>(article);
+                model = _mapper.Map<Article, ArticleViewModel>(article);                
             }           
             
             return View(model);

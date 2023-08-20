@@ -21,7 +21,13 @@
                         {
                             <span class="badge bg-primary" style="display:inline;">@tag.Name</span>
                         }
-                        <h6>@article.Text</h6>
+
+                        @{
+                            article.Text = article.Text.Substring(0, Math.Min(@article.Text.Length, 100)) + "...";
+                        }
+                        <h6>
+                            @article.Text               
+                        </h6>
                         @if (@article.User.Login is not null)
                         {
                             <p class="text-decoration-underline">@article.User.Login</p>

@@ -6,6 +6,7 @@ using BlogTask.Data.Models;
 using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogTask.Controllers
@@ -74,6 +75,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Add(CommentRequest request)
         {
             var comment = await _repository.GetAsync(request.Guid);
@@ -93,6 +95,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpPatch]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Update([FromBody] EditCommentRequest request)
         {
             var comment = await _repository.GetAsync(request.Guid);
@@ -118,6 +121,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid guid)
         {
             var comment =  await _repository.GetAsync(guid);

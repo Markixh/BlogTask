@@ -26,8 +26,8 @@ namespace BlogTask.Data
 
             builder.ApplyConfiguration(new RoleConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
-            builder.ApplyConfiguration(new ArticleConfiguration());
             builder.ApplyConfiguration(new TagConfiguration());
+            builder.ApplyConfiguration(new ArticleConfiguration());
             builder.ApplyConfiguration(new CommentConfiguration());
         }
     }

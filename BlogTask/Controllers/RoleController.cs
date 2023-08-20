@@ -30,6 +30,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("Add")]
         [HttpGet]
+        [Authorize]
         public IActionResult Add()
         {
             return View();
@@ -163,6 +164,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("Del")]
+        [Authorize]
         public async Task<IActionResult> Del(int guid)
         {
             var role = _repository.GetAsync(guid);

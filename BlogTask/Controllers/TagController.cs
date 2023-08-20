@@ -77,6 +77,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Add(TagRequest request)
         {
             var tag = await _repository.GetAsync(request.Guid);
@@ -96,6 +97,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpPatch]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Update([FromBody] EditTagRequest request)
         {
             var tag = await _repository.GetAsync(request.Guid);
@@ -120,6 +122,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid guid)
         {
             var tag = _repository.GetAsync(guid);
@@ -137,6 +140,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("Add")]
         [HttpGet]
+        [Authorize]
         public IActionResult Add()
         {
             return View();
@@ -260,6 +264,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("Del")]
+        [Authorize]
         public async Task<IActionResult> Del(Guid guid)
         {
             var tag = _repository.GetAsync(guid);

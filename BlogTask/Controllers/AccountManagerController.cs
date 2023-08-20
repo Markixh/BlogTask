@@ -125,6 +125,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("Edit")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Edit()
         {
             var user = User;
@@ -170,6 +171,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("Profile")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Profile()
         {
             var repository = _unitOfWork.GetRepository<User>() as UsersRepository;

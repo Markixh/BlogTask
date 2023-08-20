@@ -13,6 +13,12 @@ namespace BlogTask.Data.Configuration
         public void Configure(EntityTypeBuilder<Tag> builder)
         {
             builder.ToTable("Tags").HasKey(p => p.Guid);
+
+            builder.HasData(
+            new Tag[]
+            {
+                new Tag { Guid = new Guid("D8572FEE-7FC7-427B-84D7-08DB9BFBD425"), Name = "c#"}
+            });
         }
     }
 }
