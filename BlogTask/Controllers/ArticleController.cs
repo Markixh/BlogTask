@@ -162,11 +162,18 @@ namespace BlogTask.Controllers
             if (model is null)
                 return StatusCode(400, "Данные не внесены!");
 
-            var newArticle = _mapper.Map<AddViewModel, Article>(model);
-            newArticle.UserGuid = user.Guid;
-            await _repository.CreateAsync(newArticle);
+            if (ModelState.IsValid)
+            {
+                var newArticle = _mapper.Map<AddViewModel, Article>(model);
+                newArticle.UserGuid = user.Guid;
+                await _repository.CreateAsync(newArticle);
 
-            return List();
+                return List();
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         /// <summary>
@@ -199,25 +206,32 @@ namespace BlogTask.Controllers
             if (model is null)
                 return StatusCode(400, "Данные не внесены!");
 
-            bool isUpdate = false;
-
-            if (editArticle.Title != model.Title)
+            if (ModelState.IsValid)
             {
-                editArticle.Title = model.Title;
-                isUpdate = true;
-            }
-            if (editArticle.Text != model.Text)
-            {
-                editArticle.Text = model.Text;
-                isUpdate = true;
-            }
+                bool isUpdate = false;
 
-            if (isUpdate)
-            {
-                await _repository.UpdateAsync(editArticle);
-            }
+                if (editArticle.Title != model.Title)
+                {
+                    editArticle.Title = model.Title;
+                    isUpdate = true;
+                }
+                if (editArticle.Text != model.Text)
+                {
+                    editArticle.Text = model.Text;
+                    isUpdate = true;
+                }
 
-            return List();
+                if (isUpdate)
+                {
+                    await _repository.UpdateAsync(editArticle);
+                }
+
+                return List();
+            }
+            else 
+            {
+                return View(model);
+            }            
         }
 
         /// <summary>

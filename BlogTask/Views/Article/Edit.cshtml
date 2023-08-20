@@ -4,6 +4,8 @@
     ViewData["Title"] = "Изменение статьи";
 }
 
+<partial name="_ValidationScriptsPartial" />
+
 @if (Model is not null)
 {
     <div class="container my-1">
@@ -14,10 +16,12 @@
             <form method="post" asp-controller="Article" asp-action="Edit">
                 <div class="mb-3">
                     <label for="Title" class="form-label">Заголовок</label>
+                    <span asp-validation-for="Title" class="text-danger"></span>
                     <input type="text" asp-for="Title" class="form-control" id="Title">
                 </div>
                 <div class="mb-3">
                     <label for="InputText" class="form-label">Текст статьи</label>
+                    <span asp-validation-for="Text" class="text-danger"></span>
                     <textarea type="text" asp-for="Text" class="form-control" id="InputText"> </textarea>
                 </div>
                 <input type="text" asp-for="Guid" hidden />
