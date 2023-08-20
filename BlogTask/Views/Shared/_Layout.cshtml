@@ -55,7 +55,12 @@
                     else
                     {
                         <form method="get" asp-controller="AccountManager" asp-action="Login">
-                            <button class="btn btn-success">Вход</button>
+                            <ul class="navbar-nav flex-grow-1 justify-content-center">
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-area="" asp-controller="AccountManager" asp-action="Register">Регистрация</a>
+                                </li>
+                                <button class="btn btn-success">Вход</button>
+                            </ul>
                         </form>
                     }
                 </div>
