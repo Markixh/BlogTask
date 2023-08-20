@@ -116,7 +116,7 @@ namespace BlogTask.Controllers
 
             }
 
-            return RedirectToAction("Index", "Home");
+            return View("Login", model);
         }
 
         /// <summary>

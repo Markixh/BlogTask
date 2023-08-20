@@ -4,14 +4,12 @@ namespace BlogTask.Models.Account
 {
     public class LoginViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Поле Логин обязательно для заполнения")]
         [DataType(DataType.Text)]
-        [Display(Name = "Логин", Prompt = "Введите логин")]
         public string Login { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Поле Пароль обязательно для заполнения")]
         [DataType(DataType.Password)]
-        [Display(Name = "Пароль", Prompt = "Введите пароль")]
         public string Password { get; set; }
     }
 }

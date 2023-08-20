@@ -1,11 +1,15 @@
 ﻿@model BlogTask.Models.Account.LoginViewModel;
 
+<partial name="_ValidationScriptsPartial" />
+
 <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
 
 <div class="login-page">
     <div class="form">
         <form class="login-form" method="post" asp-controller="AccountManager" asp-action="Login">
+            <span asp-validation-for="Login" class="text-danger"></span>
             <input type="text" asp-for="Login" placeholder="логин" />
+            <span asp-validation-for="Password" class="text-danger"></span>
             <input type="password" asp-for="Password" placeholder="пароль" />
             <button>Вход</button>
             <p class="message">Не зарегистрированы? <a href="Register">Создайте аккаунт</a></p>
