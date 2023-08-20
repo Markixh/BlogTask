@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Добавление роли";
 }
+
+<partial name="_ValidationScriptsPartial" />
+
 <div class="container my-1">
     <div class="p-1">
 
@@ -11,6 +14,7 @@
         <form method="post" asp-controller="Role" asp-action="Add">
             <div class="mb-3">
                 <label for="Title" class="form-label">Название роли</label>
+                <span asp-validation-for="Name" class="text-danger"></span>
                 <input type="text" asp-for="Name" class="form-control" id="Title">
             </div>
             <button type="submit" class="btn btn-success">Добавить</button>
