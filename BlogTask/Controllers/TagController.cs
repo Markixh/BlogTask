@@ -241,13 +241,15 @@ namespace BlogTask.Controllers
             {
                 return View("Event", new EventViewModel() { Send = "Теги отсутствуют!" });
             }
-            if (listTags.Count() == 0)
+            if (listTags.Count == 0)
             {
                 return View("Event", new EventViewModel() { Send = "Теги отсутствуют!" });
             }
 
-            ListViewModel view = new ListViewModel();
-            view.List = _mapper.Map<List<Tag>, List<TagViewModel>>(listTags);
+            ListViewModel view = new()
+            {
+                List = _mapper.Map<List<Tag>, List<TagViewModel>>(listTags)
+            };
 
             return View("List", view);
         }
@@ -261,7 +263,7 @@ namespace BlogTask.Controllers
         public async Task<IActionResult> ViewTagAsync(Guid guid)
         {
             var tag = await _repository.GetAsync(guid);
-            TagViewModel model = new TagViewModel();
+            TagViewModel model = new();
 
             if (tag is not null)
             {

@@ -248,13 +248,15 @@ namespace BlogTask.Controllers
             {
                 return View("Event", new EventViewModel() { Send = "Статьи отсутствуют!"});
             }
-            if (listArticles.Count() == 0)
+            if (listArticles.Count == 0)
             {
                 return View("Event", new EventViewModel() { Send = "Статьи отсутствуют!" });
             }
 
-            ListViewModel view = new ListViewModel();
-            view.List = _mapper.Map<List<Article>, List<ArticleViewModel>>(listArticles);
+            ListViewModel view = new()
+            {
+                List = _mapper.Map<List<Article>, List<ArticleViewModel>>(listArticles)
+            };
 
             return View("List", view);
         }
@@ -268,7 +270,7 @@ namespace BlogTask.Controllers
         public async Task<IActionResult> ViewArticle(Guid guid)
         {
             var article = await _repository.GetAsync(guid);
-            ArticleViewModel model = new ArticleViewModel();
+            ArticleViewModel model = new();
 
             if (article is not null)
             {

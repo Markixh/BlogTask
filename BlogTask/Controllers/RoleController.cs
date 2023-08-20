@@ -143,13 +143,15 @@ namespace BlogTask.Controllers
             {
                 return View("Event", new EventViewModel() { Send = "Роли отсутствуют!" });
             }
-            if (listArticles.Count() == 0)
+            if (listArticles.Count == 0)
             {
                 return View("Event", new EventViewModel() { Send = "Роли отсутствуют!" });
             }
 
-            ListViewModel view = new ListViewModel();
-            view.List = _mapper.Map<List<Role>, List<RoleViewModel>>(listArticles);
+            ListViewModel view = new()
+            {
+                List = _mapper.Map<List<Role>, List<RoleViewModel>>(listArticles)
+            };
 
             return View("List", view);
         }
@@ -163,7 +165,7 @@ namespace BlogTask.Controllers
         public async Task<IActionResult> ViewRoleAsync(int guid)
         {
             var role = await _repository.GetAsync(guid);
-            RoleViewModel model = new RoleViewModel();
+            RoleViewModel model = new();
 
             if (role is not null)
             {                

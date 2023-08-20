@@ -19,8 +19,8 @@ namespace BlogTask.Controllers
     [Route("[controller]")]
     public class AccountManagerController : Controller
     {
-        private IMapper _mapper;
-        private IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AccountManagerController(IMapper mapper, IUnitOfWork unitOfWork)
         {
@@ -206,7 +206,7 @@ namespace BlogTask.Controllers
             var repositoryRole = _unitOfWork.GetRepository<Role>() as RolesRepository;
 
             var user = await repository.GetAsync(guid);
-            UserViewModel model = new UserViewModel();
+            UserViewModel model = new();
 
             if (user is not null)
             {
@@ -238,7 +238,7 @@ namespace BlogTask.Controllers
 
             var user = repository.GetByLogin(login);
 
-            UserViewModel model = new UserViewModel();
+            UserViewModel model = new();
 
             if (user is not null)
             {
@@ -271,7 +271,7 @@ namespace BlogTask.Controllers
             {
                 return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
             }
-            if (listUsers.Count() == 0)
+            if (listUsers.Count == 0)
             {
                 return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
             }
@@ -286,8 +286,10 @@ namespace BlogTask.Controllers
                 }
             }
 
-            ListViewModel view = new ListViewModel();
-            view.UserList = _mapper.Map<List<User>, List<UserViewModel>>(listUsers);
+            ListViewModel view = new()
+            {
+                UserList = _mapper.Map<List<User>, List<UserViewModel>>(listUsers)
+            };
 
             return View("List", view);
         }
