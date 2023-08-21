@@ -29,6 +29,7 @@ namespace BlogTask.Data
             builder.ApplyConfiguration(new TagConfiguration());
             builder.ApplyConfiguration(new ArticleConfiguration());
             builder.ApplyConfiguration(new CommentConfiguration());
+
         }
     }
 }

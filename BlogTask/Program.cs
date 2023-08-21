@@ -1,9 +1,11 @@
 using AutoMapper;
+using BlogTask.BLL.Services;
 using BlogTask.Data;
 using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NLog;
 using NLog.Web;
 
@@ -39,6 +41,9 @@ namespace BlogTask
                    .AddCustomRepository<Tag, TagsRepository>()
                 .AddCustomRepository<Comment, CommentsRepository>()
                    .AddCustomRepository<Role, RolesRepository>();
+
+                builder.Services.AddTransient<IService<Article>, ArticleService>();
+
 
                 // Add services to the container.
                 builder.Services.AddControllersWithViews();

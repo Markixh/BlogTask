@@ -19,12 +19,14 @@ namespace BlogTask.Controllers
         private readonly ArticlesRepository _repository;
         private readonly UsersRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IService<Article> _sevice;
 
-        public ArticleController(IUnitOfWork unitOfWork, IMapper mapper)
+        public ArticleController(IUnitOfWork unitOfWork, IMapper mapper, IService<Article> service)
         {
             _repository = unitOfWork.GetRepository<Article>() as ArticlesRepository;
             _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
+            _sevice = service;
         }
 
         /// <summary>
@@ -168,7 +170,7 @@ namespace BlogTask.Controllers
                 newArticle.UserGuid = user.Guid;
                 await _repository.CreateAsync(newArticle);
 
-                return List();
+                return await ListAsync();
             }
             else
             {
@@ -226,7 +228,7 @@ namespace BlogTask.Controllers
                     await _repository.UpdateAsync(editArticle);
                 }
 
-                return List();
+                return await ListAsync();
             }
             else 
             {
@@ -240,9 +242,9 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("List")]
         [HttpGet]
-        public IActionResult List()
+        public async Task<IActionResult> ListAsync()
         {
-            var listArticles = _repository.GetAll().ToList();
+            var listArticles = _sevice.GetAllAsync().Result.ToList();
 
             if (listArticles == null)
             {
@@ -269,13 +271,11 @@ namespace BlogTask.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewArticle(Guid guid)
         {
-            var article = await _repository.GetAsync(guid);
+            var article = _repository.GetWithTags(guid);
             ArticleViewModel model = new();
 
             if (article is not null)
-            {
-                var user = await _userRepository.GetAsync(article.UserGuid);
-                article.User = user;
+            {                
                 model = _mapper.Map<Article, ArticleViewModel>(article);                
             }           
             

@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BlogTask.BLL\BlogTask.BLL.csproj" />
     <ProjectReference Include="..\BlogTask.Contracts\BlogTask.Contracts.csproj" />
     <ProjectReference Include="..\BlogTask.Data\BlogTask.Data.csproj" />
   </ItemGroup>

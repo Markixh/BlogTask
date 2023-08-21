@@ -37,6 +37,7 @@ namespace BlogTask.Data.Repositories
         public async Task<T> GetAsync(Guid id)
         {
             return await Set.FindAsync(id);
+
         }
 
         public async Task<T> GetAsync(int id)
