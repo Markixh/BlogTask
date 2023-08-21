@@ -21,11 +21,13 @@ namespace BlogTask.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<AccountManagerController> _logger;
 
-        public AccountManagerController(IMapper mapper, IUnitOfWork unitOfWork)
+        public AccountManagerController(IMapper mapper, IUnitOfWork unitOfWork, ILogger<AccountManagerController> logger)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _logger.LogInformation("Создан AccountManagerController");
         }
 
         /// <summary>
@@ -36,6 +38,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            _logger.LogInformation("Перешли на страницу Register");
             return View("Register");
         }
 
@@ -55,9 +58,18 @@ namespace BlogTask.Controllers
                 var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
 
                 var findUser = repository?.GetByLogin(user.Login);
-                if (findUser is not null) { return View("Register"); }
+                if (findUser is not null) 
+                {
+                    _logger.LogInformation("Модель передана пустой");
+                    return View("Register"); 
+                }
 
                 if (repository is not null) { await repository.CreateAsync(user); }
+                _logger.LogInformation("Пользователь успешно зарегистрировался");
+            }
+            else 
+            {
+                _logger.LogWarning("Ошибка Верификации при регистрации");
             }
             return View("Register", model);
         }
@@ -66,6 +78,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            _logger.LogInformation("Перешли на страницу Login");
             return View("Login");
         }
 
@@ -81,16 +94,22 @@ namespace BlogTask.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (String.IsNullOrEmpty(model.Login) ||
-              String.IsNullOrEmpty(model.Password))
+                if (String.IsNullOrEmpty(model.Login) || String.IsNullOrEmpty(model.Password))
+                {
+                    _logger.LogWarning("Логин или пароль не заданы");
                     return StatusCode(400, "Запрос не корректен!");
+                }
 
                 var user = _mapper.Map<User>(model);
                 if (user is null)
+                {
+                    _logger.LogWarning("Модель передана пустой");
                     return StatusCode(400, "Пользователь на найден!");
+                }
 
                 if (!PasswordIsCorrect(user))
                 {
+                    _logger.LogWarning("Пароль введен не правильный");
                     return StatusCode(400, "Введенный пароль не корректен!");
                 }
 
@@ -114,10 +133,12 @@ namespace BlogTask.Controllers
                     ClaimsIdentity.DefaultRoleClaimType);
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                _logger.LogInformation("Пользователь успешно авторизовался");
                 return RedirectToAction("Index", "Home");
             }
             else
             {
+                _logger.LogWarning("Ошибка Верификации при логировании");
                 return View("Login", model);
             }
         }
@@ -136,6 +157,8 @@ namespace BlogTask.Controllers
             var user = await repository.GetAsync(guid);
 
             var editUser = _mapper.Map<User, EditUserVeiwModel>(user);
+
+            _logger.LogInformation("Перешли на страницу Редактирования пользователя");
 
             return View("Edit", editUser);
         }
@@ -187,10 +210,14 @@ namespace BlogTask.Controllers
                 {
                     await repository.UpdateAsync(editUser);
                 }
+
+                _logger.LogInformation("Данные о пользователе успешно изменены");
+
                 return await ListAsync();
             }
             else
             {
+                _logger.LogWarning("Ошибка Верификации при редактировании пользователя");
                 return View("Edit", model);
             }
         }
@@ -219,6 +246,8 @@ namespace BlogTask.Controllers
                     model.Role = role;
                 }
             }
+
+            _logger.LogInformation("Перешли на страницу просмотра информации о пользователе");
 
             return View(model);
         }
@@ -252,6 +281,8 @@ namespace BlogTask.Controllers
                 }
             }
 
+            _logger.LogInformation("Перешли на страницу просмотра информации о себе");
+
             return View("ViewUser", model);
         }
 
@@ -270,10 +301,12 @@ namespace BlogTask.Controllers
 
             if (listUsers == null)
             {
+                _logger.LogWarning("Пользователи на сайте отсутствуют");
                 return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
             }
             if (listUsers.Count == 0)
             {
+                _logger.LogWarning("Пользователи на сайте отсутствуют");
                 return View("Event", new EventViewModel() { Send = "Пользователи отсутствуют!" });
             }
 
@@ -292,6 +325,8 @@ namespace BlogTask.Controllers
                 UserList = _mapper.Map<List<User>, List<UserViewModel>>(listUsers)
             };
 
+            _logger.LogInformation("Перешли на страницу просмотра списка пользователей");
+
             return View("List", view);
         }
 
@@ -304,6 +339,8 @@ namespace BlogTask.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            _logger.LogInformation("Пользователь успешно вышел с сайта");
 
             return RedirectToAction("Index", "Home");
         }
