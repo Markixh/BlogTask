@@ -20,13 +20,16 @@ namespace BlogTask.Controllers
         private readonly UsersRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IService<Article> _sevice;
+        private readonly ILogger<Article> _logger;
 
-        public ArticleController(IUnitOfWork unitOfWork, IMapper mapper, IService<Article> service)
+        public ArticleController(IUnitOfWork unitOfWork, IMapper mapper, IService<Article> service, ILogger<Article> logger)
         {
             _repository = unitOfWork.GetRepository<Article>() as ArticlesRepository;
             _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
             _sevice = service;
+            _logger = logger;
+            _logger.LogInformation("Создан AccountManagerController");
         }
 
         /// <summary>
@@ -45,6 +48,8 @@ namespace BlogTask.Controllers
                 ArticleView = _mapper.Map<Article[], ArticleView[]>(articles)
             };
 
+            _logger.LogInformation("Получени список статей в API");
+
             return StatusCode(200, resp);
         }
 
@@ -60,7 +65,10 @@ namespace BlogTask.Controllers
             var article = await _repository.GetAsync(guid);
 
             if (article == null)
+            {
+                _logger.LogWarning("Статья отсутствует");
                 return StatusCode(400, $"Статья с Guid = {guid} отсутствует!");
+            }
 
             var resp = new ArticleView
             {
@@ -70,6 +78,8 @@ namespace BlogTask.Controllers
                 UserGuid = article.UserGuid,
                 Tags = _mapper.Map<Tag[], TagView[]>(article.Tags.ToArray())
             };
+
+            _logger.LogInformation("Статья передана в API");
 
             return StatusCode(200, resp);
         }
@@ -86,7 +96,9 @@ namespace BlogTask.Controllers
         {
             var newArticle = _mapper.Map<ArticleRequest, Article>(request);
             await _repository.CreateAsync(newArticle);
-       
+
+            _logger.LogInformation("Статья успешно добавлена через API");
+
             return StatusCode(200, newArticle);
         }
 
@@ -102,7 +114,10 @@ namespace BlogTask.Controllers
         {
             var article = await _repository.GetAsync(request.Guid);
             if (article == null)
+            {
+                _logger.LogWarning("Статья отсутствует");
                 return StatusCode(400, "Такая статья не существует!");
+            }
 
 
             var updateArticle = _repository.UpdateByArticle(
@@ -113,6 +128,8 @@ namespace BlogTask.Controllers
                     ));
 
             var resultArticle = _mapper.Map<Article, ArticleRequest>(updateArticle);
+
+            _logger.LogInformation("Статья изменена через API");
 
             return StatusCode(200, resultArticle);
         }
@@ -129,9 +146,14 @@ namespace BlogTask.Controllers
         {
             var article = await _repository.GetAsync(guid);
             if (article == null)
+            {
+                _logger.LogWarning("Статья не найдена");
                 return StatusCode(400, "Статья не найдена!");
+            }
 
             await _repository.DeleteAsync(article);
+
+            _logger.LogInformation("Статья удалена через API");
 
             return StatusCode(200);
         }
@@ -145,6 +167,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public IActionResult Add()
         {
+            _logger.LogInformation("Пользователь перешел на страницу добавления статьи");
             return View();
         }
 
@@ -162,7 +185,10 @@ namespace BlogTask.Controllers
             var user = _userRepository.GetByLogin(userName);
 
             if (model is null)
+            {
+                _logger.LogWarning("Данные на странице добавления статьи не внесены");
                 return StatusCode(400, "Данные не внесены!");
+            }
 
             if (ModelState.IsValid)
             {
@@ -170,10 +196,13 @@ namespace BlogTask.Controllers
                 newArticle.UserGuid = user.Guid;
                 await _repository.CreateAsync(newArticle);
 
+                _logger.LogInformation("Статья успешно добавлена");
+
                 return await ListAsync();
             }
             else
             {
+                _logger.LogWarning("Данные при добавлении статьи не прошли валидацию");
                 return View(model);
             }
         }
@@ -191,6 +220,8 @@ namespace BlogTask.Controllers
 
             var editArticle = _mapper.Map<Article, EditViewModel>(article);
 
+            _logger.LogInformation("Пользователь перешел на страницу изменения статьи");
+
             return View(editArticle);
         }
 
@@ -206,7 +237,10 @@ namespace BlogTask.Controllers
             var editArticle = await _repository.GetAsync(model.Guid);
 
             if (model is null)
+            {
+                _logger.LogWarning("Данные изменения статьи не внесены");
                 return StatusCode(400, "Данные не внесены!");
+            }
 
             if (ModelState.IsValid)
             {
@@ -225,15 +259,19 @@ namespace BlogTask.Controllers
 
                 if (isUpdate)
                 {
+
                     await _repository.UpdateAsync(editArticle);
                 }
 
+                _logger.LogInformation("Статья успешно изменена");
+
                 return await ListAsync();
             }
-            else 
+            else
             {
+                _logger.LogWarning("Данные для изменения статьи не прошли валидацию");
                 return View(model);
-            }            
+            }
         }
 
         /// <summary>
@@ -248,10 +286,12 @@ namespace BlogTask.Controllers
 
             if (listArticles == null)
             {
-                return View("Event", new EventViewModel() { Send = "Статьи отсутствуют!"});
+                _logger.LogWarning("Статьи отсутствуют");
+                return View("Event", new EventViewModel() { Send = "Статьи отсутствуют!" });
             }
             if (listArticles.Count == 0)
             {
+                _logger.LogWarning("Статьи отсутствуют");
                 return View("Event", new EventViewModel() { Send = "Статьи отсутствуют!" });
             }
 
@@ -259,6 +299,8 @@ namespace BlogTask.Controllers
             {
                 List = _mapper.Map<List<Article>, List<ArticleViewModel>>(listArticles)
             };
+
+            _logger.LogInformation("Пользователь перешел на страницу просмотра всех статей");
 
             return View("List", view);
         }
@@ -275,10 +317,13 @@ namespace BlogTask.Controllers
             ArticleViewModel model = new();
 
             if (article is not null)
-            {                
-                model = _mapper.Map<Article, ArticleViewModel>(article);                
-            }           
-            
+            {
+                _logger.LogInformation("Статья отсутствует");
+                model = _mapper.Map<Article, ArticleViewModel>(article);
+            }
+
+            _logger.LogInformation("Пользователь перешел на страницу просмотра статьи");
+
             return View(model);
         }
     }

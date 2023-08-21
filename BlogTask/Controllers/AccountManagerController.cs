@@ -27,6 +27,7 @@ namespace BlogTask.Controllers
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _logger = logger;
             _logger.LogInformation("Создан AccountManagerController");
         }
 

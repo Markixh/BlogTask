@@ -39,7 +39,7 @@ namespace BlogTask
                    .AddCustomRepository<User, UsersRepository>()
                    .AddCustomRepository<Article, ArticlesRepository>()
                    .AddCustomRepository<Tag, TagsRepository>()
-                .AddCustomRepository<Comment, CommentsRepository>()
+                   .AddCustomRepository<Comment, CommentsRepository>()
                    .AddCustomRepository<Role, RolesRepository>();
 
                 builder.Services.AddTransient<IService<Article>, ArticleService>();
