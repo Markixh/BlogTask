@@ -16,12 +16,15 @@ namespace BlogTask.Controllers
         private readonly RolesRepository _repository;
         private readonly UsersRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<Role> _logger;
 
-        public RoleController(IUnitOfWork unitOfWork, IMapper mapper)
+        public RoleController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Role> logger)
         {
             _repository = unitOfWork.GetRepository<Role>() as RolesRepository;
             _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
+            _logger = logger;
+            _logger.LogInformation("Создан RoleController");
         }
 
         /// <summary>
@@ -33,6 +36,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public IActionResult Add()
         {
+            _logger.LogInformation("Пользователь перешел на страницу добавления роли");
             return View();
         }
 
@@ -42,7 +46,7 @@ namespace BlogTask.Controllers
         /// <returns></returns>
         [Route("Add")]
         [HttpPost]
-        [Authorize]        
+        [Authorize]
         public async Task<IActionResult> Add(AddViewModel model)
         {
             var userName = User.Identity.Name;
@@ -50,10 +54,16 @@ namespace BlogTask.Controllers
             var user = _userRepository.GetByLogin(userName);
 
             if (model is null)
+            {
+                _logger.LogWarning("Данные на странице добавления роли не внесены");
                 return StatusCode(400, "Данные не внесены!");
+            }
 
             if (user.RoleId != 1)
+            {
+                _logger.LogWarning("Отсутствует необходимая роль для добавления роли");
                 return StatusCode(400, "Отсутствует необходимая роль!");
+            }
 
             if (ModelState.IsValid)
             {
@@ -62,10 +72,13 @@ namespace BlogTask.Controllers
 
                 await _repository.CreateAsync(newRole);
 
+                _logger.LogInformation("Роль успешно добавлена");
+
                 return List();
             }
             else
             {
+                _logger.LogWarning("Данные при добавлении роли не прошли валидацию");
                 return View(model);
             }
         }
@@ -83,6 +96,8 @@ namespace BlogTask.Controllers
 
             var editRole = _mapper.Map<Role, EditViewModel>(role);
 
+            _logger.LogInformation("Пользователь перешел на страницу редактирования роли");
+
             return View(editRole);
         }
 
@@ -98,32 +113,38 @@ namespace BlogTask.Controllers
             var editRole = await _repository.GetAsync(model.Id);
 
             if (model is null)
+            {
+                _logger.LogWarning("Данные при редактировании роли не внесены");
                 return StatusCode(400, "Данные не внесены!");
+            }
 
             if (ModelState.IsValid)
             {
                 bool isUpdate = false;
 
-            if (editRole.Name != model.Name)
-            {
-                editRole.Name = model.Name;
-                isUpdate = true;
-            }
-            if (editRole.Description != model.Description)
-            {
-                editRole.Description = model.Description;
-                isUpdate = true;
-            }
+                if (editRole.Name != model.Name)
+                {
+                    editRole.Name = model.Name;
+                    isUpdate = true;
+                }
+                if (editRole.Description != model.Description)
+                {
+                    editRole.Description = model.Description;
+                    isUpdate = true;
+                }
 
-            if (isUpdate)
-            {
-                await _repository.UpdateAsync(editRole);
-            }
+                if (isUpdate)
+                {
+                    await _repository.UpdateAsync(editRole);
+                }
 
-            return List();
-        }
+                _logger.LogInformation("Роль успешно изменена");
+
+                return List();
+            }
             else
             {
+                _logger.LogWarning("Данные при редактировании роли не прошли валидацию");
                 return View(model);
             }
         }
@@ -136,15 +157,16 @@ namespace BlogTask.Controllers
         [HttpGet]
         public IActionResult List()
         {
-
             var listArticles = _repository.GetAll().ToList();
 
             if (listArticles == null)
             {
+                _logger.LogWarning("Роли отсутствуют");
                 return View("Event", new EventViewModel() { Send = "Роли отсутствуют!" });
             }
             if (listArticles.Count == 0)
             {
+                _logger.LogWarning("Роли отсутствуют");
                 return View("Event", new EventViewModel() { Send = "Роли отсутствуют!" });
             }
 
@@ -152,6 +174,8 @@ namespace BlogTask.Controllers
             {
                 List = _mapper.Map<List<Role>, List<RoleViewModel>>(listArticles)
             };
+
+            _logger.LogInformation("Пользователь перешел на страницу просмотра списка ролей");
 
             return View("List", view);
         }
@@ -168,9 +192,13 @@ namespace BlogTask.Controllers
             RoleViewModel model = new();
 
             if (role is not null)
-            {                
+            {
+                _logger.LogWarning("Роль отсутствуют");
                 model = _mapper.Map<Role, RoleViewModel>(role);
             }
+
+            _logger.LogInformation("Пользователь перешел на страницу просмотра роли");
+
             return View(model);
         }
 
@@ -186,9 +214,14 @@ namespace BlogTask.Controllers
         {
             var role = _repository.GetAsync(guid);
             if (role == null)
+            {
+                _logger.LogWarning("Роль не найдена");
                 return StatusCode(400, "Роль не найдена!");
+            }
 
             await _repository.DeleteAsync(await role);
+
+            _logger.LogInformation("Удаление роли прошло успешно");
 
             return List();
         }
