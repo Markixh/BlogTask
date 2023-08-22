@@ -48,7 +48,7 @@ namespace BlogTask.Controllers
                 ArticleView = _mapper.Map<Article[], ArticleView[]>(articles)
             };
 
-            _logger.LogInformation("Получени список статей в API");
+            _logger.LogInformation("Получен список статей в API");
 
             return StatusCode(200, resp);
         }
