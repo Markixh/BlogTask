@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BlogTask.Contracts.Models.Tags;
 using BlogTask.Contracts.Models.Users;
 using BlogTask.Data.Models;
 using BlogTask.Data.Queries;
@@ -8,7 +7,6 @@ using BlogTask.Data.UoW;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Authentication;
 using System.Security.Claims;
 using static BlogTask.Contracts.Models.Users.GetUserRequest;
 using Microsoft.AspNetCore.Authorization;
@@ -21,11 +19,13 @@ namespace BlogTask.Controllers
     {
         private readonly UsersRepository _repository;
         private readonly IMapper _mapper;
-                
-        public UserController(IUnitOfWork unitOfWork, IMapper mapper) 
+        private readonly ILogger<User> _logger;
+
+        public UserController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<User> logger) 
         {
             _repository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         /// <summary>
@@ -44,6 +44,8 @@ namespace BlogTask.Controllers
                 UserView = _mapper.Map<User[], UserView[]>(user)
             };
 
+            _logger.LogInformation("Получен список пользователей в API");
+
             return StatusCode(200, resp);
         }
 
@@ -59,7 +61,10 @@ namespace BlogTask.Controllers
             var user = await _repository.GetAsync(guid);
 
             if (user == null)
+            {
+                _logger.LogWarning("Пользователь отсутствует");
                 return StatusCode(400, $"Пользователь с Guid = {guid} отсутствует!");
+            }
 
             var resp = new UserView
             {
@@ -69,6 +74,8 @@ namespace BlogTask.Controllers
                 LastName = user.LastName,
                 Surname = user.SurName
             };
+
+            _logger.LogInformation("Данные пользователя переданы в API");
 
             return StatusCode(200, resp);
         }
@@ -84,10 +91,15 @@ namespace BlogTask.Controllers
         {
             var user = await _repository.GetAsync(request.Guid);
             if (user != null)
+            {
+                _logger.LogWarning("Такой пользователь уже существует");
                 return StatusCode(400, "Такой пользователь уже существует!");
+            }
 
             var newUser = _mapper.Map<UserRequest, User>(request);
             await _repository.CreateAsync(newUser);
+
+            _logger.LogInformation("Регистрация нового пользователя прошла успешно в API");
 
             return StatusCode(200, newUser);
         }
@@ -103,7 +115,10 @@ namespace BlogTask.Controllers
         {
             var user = await _repository.GetAsync(request.Guid);
             if (user == null)
+            {
+                _logger.LogWarning("Такой пользователь не существует");
                 return StatusCode(400, "Такой пользователь не существует!");
+            }
                        
 
             var updateUser = _repository.UpdateByUser(
@@ -116,6 +131,8 @@ namespace BlogTask.Controllers
                     request.NewPassword));
 
             var resultUser = _mapper.Map<User, UserRequest>(updateUser);
+
+            _logger.LogInformation("Данные пользователя успешно изменены через API");
 
             return StatusCode(200, resultUser);
         }
@@ -132,9 +149,14 @@ namespace BlogTask.Controllers
         {
             var user = await _repository.GetAsync(id);
             if (user == null)
+            {
+                _logger.LogWarning("Пользователь не найден");
                 return StatusCode(400, "Пользователь не найден!");
+            }
 
             await _repository.DeleteAsync(user);
+
+            _logger.LogInformation("Пользователя успешно удален через API");
 
             return StatusCode(200);
         }
@@ -143,16 +165,24 @@ namespace BlogTask.Controllers
         [Route("authenticate")]
         public async Task<IActionResult> Authenticate(string login, string password)
         {
-            if (String.IsNullOrEmpty(login) ||
-              String.IsNullOrEmpty(password))
+            if (String.IsNullOrEmpty(login) || String.IsNullOrEmpty(password))
+            {
+                _logger.LogWarning("Запрос для аутентификации не содержит имени пользователя и пароля");
                 return StatusCode(400, "Запрос не корректен!");
+            }
 
             User user = _repository.GetByLogin(login);
             if (user is null)
+            {
+                _logger.LogWarning("Пользователь не найден");
                 return StatusCode(400, "Пользователь на найден!");
+            }
 
             if (user.Password != password)
+            {
+                _logger.LogWarning("Введенный пароль неправильный");
                 return StatusCode(400, "Введенный пароль не корректен!");
+            }
 
             var claims = new List<Claim>
             {
@@ -168,6 +198,7 @@ namespace BlogTask.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
+            _logger.LogInformation("Аутентификация успешно прошла через API");
 
             return StatusCode(200, _mapper.Map<User, UserView>(user));
         }
