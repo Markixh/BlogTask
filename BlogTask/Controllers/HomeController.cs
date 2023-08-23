@@ -25,6 +25,7 @@ namespace BlogTask.Controllers
         }
 
         [Route("Home/Error")]
+        [HttpGet]
         public IActionResult Error(int? statusCode = null)
         {
             if (statusCode.HasValue)
