@@ -24,10 +24,73 @@ namespace BlogTask.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Route("Home/Error")]
+        public IActionResult Error(int? statusCode = null)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (statusCode.HasValue)
+            {
+                if (statusCode == 400 || statusCode == 403 || statusCode == 404)
+                {
+                    var viewName = statusCode.ToString();
+                    _logger.LogError($"Произошла ошибка - {statusCode}\n{viewName}");
+                    return View(viewName);
+                }
+            }
+            return View("400");
+        }
+
+        /// <summary>
+        /// Генерация ошибки 400
+        /// </summary>
+        /// <returns></returns>
+        [Route("GetException400")]
+        [HttpGet]
+        public IActionResult GetException400()
+        {
+            try
+            {
+                throw new HttpRequestException("400");
+            }
+            catch
+            {
+                return View("400");
+            }
+        }
+
+        /// <summary>
+        /// Генерация ошибки 403
+        /// </summary>
+        /// <returns></returns>
+        [Route("GetException403")]
+        [HttpGet]
+        public IActionResult GetException403()
+        {
+            try
+            {
+                throw new HttpRequestException("403");
+            }
+            catch
+            {
+                return View("403");
+            }
+        }
+
+        /// <summary>
+        /// Генерация ошибки 404
+        /// </summary>
+        /// <returns></returns>
+        [Route("GetException404")]
+        [HttpGet]
+        public IActionResult GetException404()
+        {
+            try
+            {
+                throw new HttpRequestException("404");
+            }
+            catch
+            {
+                return View("404");
+            }
         }
     }
 }

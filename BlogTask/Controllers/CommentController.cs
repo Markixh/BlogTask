@@ -18,7 +18,7 @@ namespace BlogTask.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<Comment> _logger;
 
-        public CommentController(IUnitOfWork unitOfWork, IMapper mapper, )
+        public CommentController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Comment> _logger)
         {
             _repository = unitOfWork.GetRepository<Comment>() as CommentsRepository;
             _mapper = mapper;
