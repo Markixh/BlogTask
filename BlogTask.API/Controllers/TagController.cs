@@ -14,14 +14,12 @@ namespace BlogTask.API.Controllers
     [Route("[controller]")]
     public class TagController : ControllerBase
     {
-        private readonly IService<User> _userService;
         private readonly IService<Tag> _tagService;
         private readonly IMapper _mapper;
         private readonly ILogger<Tag> _logger;
 
-        public TagController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Tag> logger, IService<Tag> tagService, IService<User> userService)
+        public TagController(IMapper mapper, ILogger<Tag> logger, IService<Tag> tagService, IService<User> userService)
         {
-            _userService = userService;
             _tagService = tagService;
             _mapper = mapper;
             _logger = logger;

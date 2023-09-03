@@ -1,4 +1,5 @@
 ﻿using BlogTask.Data.Models;
+using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 using System.Data;
@@ -42,6 +43,17 @@ namespace BlogTask.BLL.Services
         public async Task UpdateAsync(Role role)
         {
             await _rolesRepository.UpdateAsync(role);
+        }
+
+        public async Task<Role> UpdateAsync(Role role, UpdateRoleQuery query)
+        {
+            if (!string.IsNullOrEmpty(query.NewName))
+                role.Name = query.NewName;
+            if (!string.IsNullOrEmpty(query.NewDescription))
+                role.Description = query.NewDescription;
+
+            await UpdateAsync(role);
+            return role;
         }
     }
 }
