@@ -11,17 +11,6 @@ namespace BlogTask.Data.Repositories
 
         }
 
-        public Article UpdateByArticle(Article article, UpdateArticleQuery updateArticleQuery)
-        {
-            if (!string.IsNullOrEmpty(updateArticleQuery.NewTitle))
-                article.Title = updateArticleQuery.NewTitle;
-            if (!string.IsNullOrEmpty(updateArticleQuery.NewText))
-                article.Text = updateArticleQuery.NewText;
-
-            UpdateAsync(article).Wait();
-            return article;
-        }
-
         public Article GetWithTags(Guid guid) 
         {
             var article = Set.Where(a => a.Guid == guid).FirstOrDefault();

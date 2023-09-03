@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlogTask.BLL.Services;
 using BlogTask.Contracts.Models.Article;
 using BlogTask.Contracts.Models.Tags;
 using BlogTask.Data.Models;
@@ -13,8 +14,7 @@ namespace BlogTask.API.Controllers
     [ApiController]
     [Route("[controller]")]
     public class ArticleController : ControllerBase
-    {
-        private readonly ArticlesRepository _articlesRepository;
+    {        
         private readonly UsersRepository _usersRepository;
         private readonly IMapper _mapper;
         private readonly IService<Article> _articleService;
@@ -22,7 +22,6 @@ namespace BlogTask.API.Controllers
 
         public ArticleController(IUnitOfWork unitOfWork, IMapper mapper, IService<Article> service, ILogger<Article> logger)
         {
-            _articlesRepository = unitOfWork.GetRepository<Article>() as ArticlesRepository;
             _usersRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
             _articleService = service;
@@ -36,9 +35,9 @@ namespace BlogTask.API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var articles = _articlesRepository.GetAll().ToArray();
+            var articles = _articleService.GetAllAsync().Result.ToArray();
 
             var resp = new GetAeticleResponse
             {
@@ -60,7 +59,7 @@ namespace BlogTask.API.Controllers
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
         {
-            var article = await _articlesRepository.GetAsync(guid);
+            var article = await _articleService.GetAsync(guid);
 
             if (article == null)
             {
@@ -93,7 +92,7 @@ namespace BlogTask.API.Controllers
         public async Task<IActionResult> Add(ArticleRequest request)
         {
             var newArticle = _mapper.Map<ArticleRequest, Article>(request);
-            await _articlesRepository.CreateAsync(newArticle);
+            await _articleService.CreateAsync(newArticle);
 
             _logger.LogInformation("Статья успешно добавлена через API");
 
@@ -110,15 +109,14 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Update([FromBody] EditArticleRequest request)
         {
-            var article = await _articlesRepository.GetAsync(request.Guid);
+            var article = await _articleService.GetAsync(request.Guid);
             if (article == null)
             {
                 _logger.LogWarning("Статья отсутствует");
                 return StatusCode(400, "Такая статья не существует!");
             }
 
-
-            var updateArticle = _articlesRepository.UpdateByArticle(
+            var updateArticle = await ((ArticleService)_articleService).UpdateAsync(
                 article,
                 new UpdateArticleQuery(
                     request.NewTitle,
@@ -142,14 +140,14 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(Guid guid)
         {
-            var article = await _articlesRepository.GetAsync(guid);
+            var article = await _articleService.GetAsync(guid);
             if (article == null)
             {
                 _logger.LogWarning("Статья не найдена");
                 return StatusCode(400, "Статья не найдена!");
             }
 
-            await _articlesRepository.DeleteAsync(article);
+            await _articleService.DeleteAsync(article);
 
             _logger.LogInformation("Статья удалена через API");
 
