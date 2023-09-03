@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Security.Claims;
 using BlogTask.Models;
+using BlogTask.BLL.Services;
 
 namespace BlogTask.Controllers
 {
@@ -17,13 +17,17 @@ namespace BlogTask.Controllers
     public class AccountManagerController : Controller
     {
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly UsersRepository _usersRepository;
+        private readonly RolesRepository _rolesRepository;
+        private readonly IService<User> _userService;
         private readonly ILogger<AccountManagerController> _logger;
 
-        public AccountManagerController(IMapper mapper, IUnitOfWork unitOfWork, ILogger<AccountManagerController> logger)
+        public AccountManagerController(IMapper mapper, IUnitOfWork unitOfWork, ILogger<AccountManagerController> logger, IService<User> service)
         {
             _mapper = mapper;
-            _unitOfWork = unitOfWork;
+            _usersRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _rolesRepository = unitOfWork.GetRepository<Role>() as RolesRepository;
+            _userService = service;
             _logger = logger;
             _logger.LogInformation("Создан AccountManagerController");
         }
@@ -53,16 +57,14 @@ namespace BlogTask.Controllers
             {
                 var user = _mapper.Map<User>(model);
 
-                var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
-
-                var findUser = repository?.GetByLogin(user.Login);
+                var findUser = _usersRepository?.GetByLogin(user.Login);
                 if (findUser is not null) 
                 {
                     _logger.LogInformation("Модель передана пустой");
                     return View("Register"); 
                 }
 
-                if (repository is not null) { await repository.CreateAsync(user); }
+                if (_usersRepository is not null) { await _usersRepository.CreateAsync(user); }
                 _logger.LogInformation("Пользователь успешно зарегистрировался");
             }
             else 
@@ -110,12 +112,10 @@ namespace BlogTask.Controllers
                     _logger.LogWarning("Пароль введен не правильный");
                     return StatusCode(400, "Введенный пароль не корректен!");
                 }
+                
+                var roleId = _usersRepository?.GetByLogin(user.Login).RoleId;
 
-                var userRepository = _unitOfWork.GetRepository<User>() as UsersRepository;
-                var roleId = userRepository?.GetByLogin(user.Login).RoleId;
-
-                var roleRepository = _unitOfWork.GetRepository<Role>() as RolesRepository;
-                var roleName = roleId is null ? "Пользователь" : roleRepository?.GetAsync((int)roleId).Result.Name;
+                var roleName = roleId is null ? "Пользователь" : _rolesRepository?.GetAsync((int)roleId).Result.Name;
                 roleName = roleName is null ? "Пользователь" : roleName;
 
                 var claims = new List<Claim>
@@ -150,9 +150,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(Guid guid)
         {
-            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
-
-            var user = await repository.GetAsync(guid);
+            var user = await _usersRepository.GetAsync(guid);
 
             var editUser = _mapper.Map<User, EditUserVeiwModel>(user);
 
@@ -170,8 +168,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(EditUserVeiwModel model)
         {
-            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
-            var editUser = await repository.GetAsync(model.Guid);
+            var editUser = await _usersRepository.GetAsync(model.Guid);
 
             if (ModelState.IsValid)
             {
@@ -206,7 +203,7 @@ namespace BlogTask.Controllers
 
                 if (isUpdate)
                 {
-                    await repository.UpdateAsync(editUser);
+                    await _usersRepository.UpdateAsync(editUser);
                 }
 
                 _logger.LogInformation("Данные о пользователе успешно изменены");
@@ -228,17 +225,14 @@ namespace BlogTask.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewUser(Guid guid)
         {
-            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
-            var repositoryRole = _unitOfWork.GetRepository<Role>() as RolesRepository;
-
-            var user = await repository.GetAsync(guid);
+            var user = await _usersRepository.GetAsync(guid);
             UserViewModel model = new();
 
             if (user is not null)
             {
                 model = _mapper.Map<User, UserViewModel>(user);
 
-                var role = await repositoryRole.GetAsync((int)user.RoleId);
+                var role = await _rolesRepository.GetAsync((int)user.RoleId);
 
                 if (role != null)
                 {
@@ -260,12 +254,9 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Profile()
         {
-            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
-            var repositoryRole = _unitOfWork.GetRepository<Role>() as RolesRepository;
-
             var login = User.Identity.Name;
 
-            var user = repository.GetByLogin(login);
+            var user = _usersRepository.GetByLogin(login);
 
             UserViewModel model = new();
 
@@ -273,7 +264,7 @@ namespace BlogTask.Controllers
             {
                 model = _mapper.Map<User, UserViewModel>(user);
 
-                var role = await repositoryRole.GetAsync((int)user.RoleId);
+                var role = await _rolesRepository.GetAsync((int)user.RoleId);
 
                 if (role != null)
                 {
@@ -294,10 +285,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public async Task<IActionResult> ListAsync()
         {
-            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
-            var repositoryRole = _unitOfWork.GetRepository<Role>() as RolesRepository;
-
-            var listUsers = repository.GetAll().ToList();
+            var listUsers = _usersRepository.GetAll().ToList();
 
             if (listUsers == null)
             {
@@ -312,7 +300,7 @@ namespace BlogTask.Controllers
 
             foreach (var user in listUsers)
             {
-                var role = await repositoryRole.GetAsync((int)user.RoleId);
+                var role = await _rolesRepository.GetAsync((int)user.RoleId);
 
                 if (role != null)
                 {
@@ -347,9 +335,7 @@ namespace BlogTask.Controllers
 
         private bool PasswordIsCorrect(User user)
         {
-            var repository = _unitOfWork.GetRepository<User>() as UsersRepository;
-
-            var findUser = repository.GetByLogin(user.Login);
+            var findUser = _usersRepository.GetByLogin(user.Login);
 
             if (findUser is null) { return false; }
 

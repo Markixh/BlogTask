@@ -12,15 +12,17 @@ namespace BlogTask.Controllers
     [Route("[controller]")]
     public class RoleController : Controller
     {
-        private readonly RolesRepository _repository;
+        private readonly RolesRepository _rolesRepository;
         private readonly UsersRepository _userRepository;
+        private readonly IService<Role> _roleService;
         private readonly IMapper _mapper;
         private readonly ILogger<Role> _logger;
 
-        public RoleController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Role> logger)
+        public RoleController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Role> logger, IService<Role> service)
         {
-            _repository = unitOfWork.GetRepository<Role>() as RolesRepository;
+            _rolesRepository = unitOfWork.GetRepository<Role>() as RolesRepository;
             _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _roleService = service;
             _mapper = mapper;
             _logger = logger;
             _logger.LogInformation("Создан RoleController");
@@ -69,7 +71,7 @@ namespace BlogTask.Controllers
 
                 var newRole = _mapper.Map<AddViewModel, Role>(model);
 
-                await _repository.CreateAsync(newRole);
+                await _rolesRepository.CreateAsync(newRole);
 
                 _logger.LogInformation("Роль успешно добавлена");
 
@@ -91,7 +93,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> EditAsync(int guid)
         {
-            var role = await _repository.GetAsync(guid);
+            var role = await _rolesRepository.GetAsync(guid);
 
             var editRole = _mapper.Map<Role, EditViewModel>(role);
 
@@ -109,7 +111,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(EditViewModel model)
         {
-            var editRole = await _repository.GetAsync(model.Id);
+            var editRole = await _rolesRepository.GetAsync(model.Id);
 
             if (model is null)
             {
@@ -134,7 +136,7 @@ namespace BlogTask.Controllers
 
                 if (isUpdate)
                 {
-                    await _repository.UpdateAsync(editRole);
+                    await _rolesRepository.UpdateAsync(editRole);
                 }
 
                 _logger.LogInformation("Роль успешно изменена");
@@ -156,7 +158,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public IActionResult List()
         {
-            var listArticles = _repository.GetAll().ToList();
+            var listArticles = _rolesRepository.GetAll().ToList();
 
             if (listArticles == null)
             {
@@ -187,7 +189,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewRoleAsync(int guid)
         {
-            var role = await _repository.GetAsync(guid);
+            var role = await _rolesRepository.GetAsync(guid);
             RoleViewModel model = new();
 
             if (role is not null)
@@ -211,14 +213,14 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Del(int guid)
         {
-            var role = _repository.GetAsync(guid);
+            var role = _rolesRepository.GetAsync(guid);
             if (role == null)
             {
                 _logger.LogWarning("Роль не найдена");
                 return StatusCode(400, "Роль не найдена!");
             }
 
-            await _repository.DeleteAsync(await role);
+            await _rolesRepository.DeleteAsync(await role);
 
             _logger.LogInformation("Удаление роли прошло успешно");
 

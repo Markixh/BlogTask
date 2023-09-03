@@ -9,18 +9,21 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BlogTask.API.Controllers
 {
+    [ApiController]
     [Route("[controller]")]
-    public class TagController : Controller
+    public class TagController : ControllerBase
     {
-        private readonly TagsRepository _repository;
-        private readonly UsersRepository _userRepository;
+        private readonly TagsRepository _tagsRepository;
+        private readonly UsersRepository _usersRepository;
+        private readonly IService<Tag> _tagService;
         private readonly IMapper _mapper;
         private readonly ILogger<Tag> _logger;
 
-        public TagController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Tag> logger)
+        public TagController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Tag> logger, IService<Tag> service)
         {
-            _repository = unitOfWork.GetRepository<Tag>() as TagsRepository;
-            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _tagsRepository = unitOfWork.GetRepository<Tag>() as TagsRepository;
+            _usersRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _tagService = service;
             _mapper = mapper;
             _logger = logger;
         }
@@ -33,7 +36,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public IActionResult GetAll()
         {
-            var tag = _repository.GetAll().ToArray();
+            var tag = _tagsRepository.GetAll().ToArray();
 
             var resp = new GetTagResponse
             {
@@ -55,7 +58,7 @@ namespace BlogTask.API.Controllers
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
         {
-            var tag = await _repository.GetAsync(guid);
+            var tag = await _tagsRepository.GetAsync(guid);
 
             if (tag == null)
             {
@@ -84,7 +87,7 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Add(TagRequest request)
         {
-            var tag = await _repository.GetAsync(request.Guid);
+            var tag = await _tagsRepository.GetAsync(request.Guid);
             if (tag != null)
             {
                 _logger.LogWarning("Тег отсутствует");
@@ -92,7 +95,7 @@ namespace BlogTask.API.Controllers
             }
 
             var newTag = _mapper.Map<TagRequest, Tag>(request);
-            await _repository.CreateAsync(newTag);
+            await _tagsRepository.CreateAsync(newTag);
 
             _logger.LogInformation("Тег успешно добавлен через API");
 
@@ -109,14 +112,14 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Update([FromBody] EditTagRequest request)
         {
-            var tag = await _repository.GetAsync(request.Guid);
+            var tag = await _tagsRepository.GetAsync(request.Guid);
             if (tag == null)
             {
                 _logger.LogWarning("Такой тэг не существует");
                 return StatusCode(400, "Такой тэг не существует!");
             }
 
-            var updateTag = _repository.UpdateByTag(
+            var updateTag = _tagsRepository.UpdateByTag(
                 tag,
                 new UpdateTagQuery(
                     request.NewName));
@@ -138,14 +141,14 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(Guid guid)
         {
-            var tag = _repository.GetAsync(guid);
+            var tag = _tagsRepository.GetAsync(guid);
             if (tag == null)
             {
                 _logger.LogWarning("Такой тэг не найден");
                 return StatusCode(400, "Тэг не найден!");
             }
 
-            await _repository.DeleteAsync(await tag);
+            await _tagsRepository.DeleteAsync(await tag);
 
             _logger.LogInformation("Тег успешно удален через API");
 

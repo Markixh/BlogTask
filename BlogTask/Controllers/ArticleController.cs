@@ -12,7 +12,7 @@ namespace BlogTask.Controllers
     [Route("[controller]")]
     public class ArticleController : Controller
     {
-        private readonly ArticlesRepository _repository;
+        private readonly ArticlesRepository _articleRepository;
         private readonly UsersRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IService<Article> _sevice;
@@ -20,7 +20,7 @@ namespace BlogTask.Controllers
 
         public ArticleController(IUnitOfWork unitOfWork, IMapper mapper, IService<Article> service, ILogger<Article> logger)
         {
-            _repository = unitOfWork.GetRepository<Article>() as ArticlesRepository;
+            _articleRepository = unitOfWork.GetRepository<Article>() as ArticlesRepository;
             _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
             _sevice = service;
@@ -64,7 +64,7 @@ namespace BlogTask.Controllers
             {
                 var newArticle = _mapper.Map<AddViewModel, Article>(model);
                 newArticle.UserGuid = user.Guid;
-                await _repository.CreateAsync(newArticle);
+                await _articleRepository.CreateAsync(newArticle);
 
                 _logger.LogInformation("Статья успешно добавлена");
 
@@ -86,7 +86,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(Guid guid)
         {
-            var article = await _repository.GetAsync(guid);
+            var article = await _articleRepository.GetAsync(guid);
 
             var editArticle = _mapper.Map<Article, EditViewModel>(article);
 
@@ -104,7 +104,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(EditViewModel model)
         {
-            var editArticle = await _repository.GetAsync(model.Guid);
+            var editArticle = await _articleRepository.GetAsync(model.Guid);
 
             if (model is null)
             {
@@ -130,7 +130,7 @@ namespace BlogTask.Controllers
                 if (isUpdate)
                 {
 
-                    await _repository.UpdateAsync(editArticle);
+                    await _articleRepository.UpdateAsync(editArticle);
                 }
 
                 _logger.LogInformation("Статья успешно изменена");
@@ -183,7 +183,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewArticle(Guid guid)
         {
-            var article = _repository.GetWithTags(guid);
+            var article = _articleRepository.GetWithTags(guid);
             ArticleViewModel model = new();
 
             if (article is not null)

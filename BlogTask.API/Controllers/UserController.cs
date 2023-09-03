@@ -14,13 +14,15 @@ namespace BlogTask.API.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly UsersRepository _repository;
+        private readonly UsersRepository _userRepository;
+        private readonly IService<User> _userService;
         private readonly IMapper _mapper;
         private readonly ILogger<User> _logger;
 
-        public UserController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<User> logger) 
+        public UserController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<User> logger, IService<User> service) 
         {
-            _repository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _userService = service;
             _mapper = mapper;
             _logger = logger;
         }
@@ -33,7 +35,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public IActionResult GetAll()
         {
-            var user = _repository.GetAll().ToArray();
+            var user = _userRepository.GetAll().ToArray();
 
             var resp = new GetUserResponse
             {
@@ -55,7 +57,7 @@ namespace BlogTask.API.Controllers
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
         {
-            var user = await _repository.GetAsync(guid);
+            var user = await _userRepository.GetAsync(guid);
 
             if (user == null)
             {
@@ -86,7 +88,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public async Task<IActionResult> Registration(UserRequest request)
         {
-            var user = await _repository.GetAsync(request.Guid);
+            var user = await _userRepository.GetAsync(request.Guid);
             if (user != null)
             {
                 _logger.LogWarning("Такой пользователь уже существует");
@@ -94,7 +96,7 @@ namespace BlogTask.API.Controllers
             }
 
             var newUser = _mapper.Map<UserRequest, User>(request);
-            await _repository.CreateAsync(newUser);
+            await _userRepository.CreateAsync(newUser);
 
             _logger.LogInformation("Регистрация нового пользователя прошла успешно в API");
 
@@ -110,7 +112,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public async Task<IActionResult> Update([FromBody] EditUserRequest request)
         {
-            var user = await _repository.GetAsync(request.Guid);
+            var user = await _userRepository.GetAsync(request.Guid);
             if (user == null)
             {
                 _logger.LogWarning("Такой пользователь не существует");
@@ -118,7 +120,7 @@ namespace BlogTask.API.Controllers
             }
                        
 
-            var updateUser = _repository.UpdateByUser(
+            var updateUser = _userRepository.UpdateByUser(
                 user,
                 new UpdateUserQuery(
                     request.NewLogin,
@@ -144,14 +146,14 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var user = await _repository.GetAsync(id);
+            var user = await _userRepository.GetAsync(id);
             if (user == null)
             {
                 _logger.LogWarning("Пользователь не найден");
                 return StatusCode(400, "Пользователь не найден!");
             }
 
-            await _repository.DeleteAsync(user);
+            await _userRepository.DeleteAsync(user);
 
             _logger.LogInformation("Пользователя успешно удален через API");
 

@@ -7,18 +7,21 @@ using System;
 
 namespace BlogTask.API.Controllers
 {
+    [ApiController]
     [Route("[controller]")]
-    public class RoleController : Controller
+    public class RoleController : ControllerBase
     {
-        private readonly RolesRepository _repository;
-        private readonly UsersRepository _userRepository;
+        private readonly RolesRepository _rolesRepository;
+        private readonly UsersRepository _usersRepository;
+        private readonly IService<Role> _roleService;
         private readonly IMapper _mapper;
         private readonly ILogger<Role> _logger;
 
-        public RoleController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Role> logger)
+        public RoleController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Role> logger, IService<Role> service)
         {
-            _repository = unitOfWork.GetRepository<Role>() as RolesRepository;
-            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _rolesRepository = unitOfWork.GetRepository<Role>() as RolesRepository;
+            _usersRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _roleService = service;
             _mapper = mapper;
             _logger = logger;
             _logger.LogInformation("Создан RoleController");

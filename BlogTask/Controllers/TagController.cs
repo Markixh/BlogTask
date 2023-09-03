@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BlogTask.Data.Models;
-using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 using BlogTask.Models;
@@ -14,14 +13,16 @@ namespace BlogTask.Controllers
     public class TagController : Controller
     {
         private readonly TagsRepository _repository;
-        private readonly UsersRepository _userRepository;
+        private readonly UsersRepository _usersRepository;
+        private readonly IService<Tag> _tagService;
         private readonly IMapper _mapper;
         private readonly ILogger<Tag> _logger;
 
-        public TagController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Tag> logger)
+        public TagController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Tag> logger, IService<Tag> service)
         {
             _repository = unitOfWork.GetRepository<Tag>() as TagsRepository;
-            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _usersRepository = unitOfWork.GetRepository<User>() as UsersRepository;
+            _tagService = service;
             _mapper = mapper;
             _logger = logger;
         }
@@ -39,8 +40,6 @@ namespace BlogTask.Controllers
             return View();
         }
 
-
-
         /// <summary>
         /// Обработка данных для добавления роли
         /// </summary>
@@ -52,7 +51,7 @@ namespace BlogTask.Controllers
         {
             var userName = User.Identity.Name;
 
-            var user = _userRepository.GetByLogin(userName);
+            var user = _usersRepository.GetByLogin(userName);
 
             if (model is null)
             {
