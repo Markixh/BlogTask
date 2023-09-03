@@ -1,12 +1,21 @@
 ﻿using BlogTask.Data.Models;
+using BlogTask.Data.Repositories;
+using BlogTask.Data.UoW;
 
 namespace BlogTask.BLL.Services
 {
     public class RoleService : IService<Role>
     {
-        public Task CreateAsync(Role item)
+        private readonly RolesRepository _rolesRepository;
+
+        public RoleService(IUnitOfWork unitOfWork)
         {
-            throw new NotImplementedException();
+            _rolesRepository = unitOfWork.GetRepository<Role>() as RolesRepository;
+        }
+
+        public async Task CreateAsync(Role role)
+        {
+            await _rolesRepository.CreateAsync(role);
         }
 
         public Task DeleteAsync(Role item)
@@ -14,9 +23,9 @@ namespace BlogTask.BLL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Role>> GetAllAsync()
+        public async Task<IEnumerable<Role>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return _rolesRepository.GetAll().ToArray();
         }
 
         public Task<Role> GetAsync(Guid id)
@@ -26,12 +35,12 @@ namespace BlogTask.BLL.Services
 
         public Task<Role> GetAsync(int id)
         {
-            throw new NotImplementedException();
+            return _rolesRepository.GetAsync(id);
         }
 
-        public Task UpdateAsync(Role item)
+        public async Task UpdateAsync(Role role)
         {
-            throw new NotImplementedException();
+            await _rolesRepository.UpdateAsync(role);
         }
     }
 }
