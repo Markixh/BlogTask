@@ -43,6 +43,9 @@ namespace BlogTask.API
                    .AddCustomRepository<Role, RolesRepository>();
 
                 builder.Services.AddTransient<IService<Article>, ArticleService>();
+                builder.Services.AddTransient<IService<Tag>, TagService>();
+                builder.Services.AddTransient<IService<Role>, RoleService>();
+                builder.Services.AddTransient<IService<User>, UserService>();
 
                 builder.Services.AddControllers();
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

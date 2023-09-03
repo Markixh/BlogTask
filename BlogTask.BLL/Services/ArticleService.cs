@@ -1,7 +1,6 @@
 ﻿using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
-using System.Collections;
 
 namespace BlogTask.BLL.Services
 {

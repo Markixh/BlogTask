@@ -42,7 +42,9 @@ namespace BlogTask
                    .AddCustomRepository<Role, RolesRepository>();
 
                 builder.Services.AddTransient<IService<Article>, ArticleService>();
-
+                builder.Services.AddTransient<IService<Tag>, TagService>();
+                builder.Services.AddTransient<IService<Role>, RoleService>();
+                builder.Services.AddTransient<IService<User>, UserService>();
 
                 // Add services to the container.
                 builder.Services.AddControllersWithViews();
