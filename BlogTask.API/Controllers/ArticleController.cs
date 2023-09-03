@@ -14,15 +14,13 @@ namespace BlogTask.API.Controllers
     [ApiController]
     [Route("[controller]")]
     public class ArticleController : ControllerBase
-    {        
-        private readonly UsersRepository _usersRepository;
+    { 
         private readonly IMapper _mapper;
         private readonly IService<Article> _articleService;
         private readonly ILogger<Article> _logger;
 
-        public ArticleController(IUnitOfWork unitOfWork, IMapper mapper, IService<Article> service, ILogger<Article> logger)
+        public ArticleController(IMapper mapper, IService<Article> service, ILogger<Article> logger)
         {
-            _usersRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
             _articleService = service;
             _logger = logger;

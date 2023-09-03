@@ -1,4 +1,5 @@
 ﻿using BlogTask.Data.Models;
+using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 
@@ -38,6 +39,15 @@ namespace BlogTask.BLL.Services
         public Task<Comment> GetAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Comment> UpdateAsync(Comment comment, UpdateCommentQuery query)
+        {
+            if (!string.IsNullOrEmpty(query.NewText))
+                comment.Text = query.NewText;
+
+            await UpdateAsync(comment);
+            return comment;
         }
 
         public async Task UpdateAsync(Comment comment)

@@ -1,4 +1,5 @@
 ﻿using BlogTask.Data.Models;
+using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
 
@@ -37,6 +38,15 @@ namespace BlogTask.BLL.Services
         {
             throw new NotImplementedException();
         }
+        public async Task<Tag> UpdateAsync(Tag tag, UpdateTagQuery query)
+        {
+            if (!string.IsNullOrEmpty(query.NewName))
+                tag.Name = query.NewName;
+
+            await UpdateAsync(tag);
+            return tag;
+        }
+
 
         public async Task UpdateAsync(Tag tag)
         {

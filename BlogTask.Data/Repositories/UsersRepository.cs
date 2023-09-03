@@ -13,23 +13,12 @@ namespace BlogTask.Data.Repositories
 
         public User UpdateByUser(User user, UpdateUserQuery updateUserQuery)
         {
-            if (!string.IsNullOrEmpty(updateUserQuery.NewLogin))
-                user.Login = updateUserQuery.NewLogin;
-            if (!string.IsNullOrEmpty(updateUserQuery.NewFirstName))
-                user.FirstName = updateUserQuery.NewFirstName;
-            if (!string.IsNullOrEmpty(updateUserQuery.NewLastName))
-                user.LastName = updateUserQuery.NewLastName;
-            if (!string.IsNullOrEmpty(updateUserQuery.NewSurName))
-                user.SurName = updateUserQuery.NewSurName;
-            if (!string.IsNullOrEmpty(updateUserQuery.NewPassword))
-                user.Password = updateUserQuery.NewPassword;
-
             UpdateAsync(user).Wait();
 
             return user;
         }
 
-        public User GetByLogin(string login) 
+        public User GetByLogin(string login)
         {
             var user = this.GetAll().AsEnumerable().FirstOrDefault(x => x.Login == login);
 

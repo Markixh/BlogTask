@@ -2,11 +2,10 @@
 using BlogTask.Contracts.Models.Users;
 using BlogTask.Data.Models;
 using BlogTask.Data.Queries;
-using BlogTask.Data.Repositories;
-using BlogTask.Data.UoW;
 using Microsoft.AspNetCore.Mvc;
 using static BlogTask.Contracts.Models.Users.GetUserRequest;
 using Microsoft.AspNetCore.Authorization;
+using BlogTask.BLL.Services;
 
 namespace BlogTask.API.Controllers
 {
@@ -14,14 +13,12 @@ namespace BlogTask.API.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly UsersRepository _userRepository;
         private readonly IService<User> _userService;
         private readonly IMapper _mapper;
         private readonly ILogger<User> _logger;
 
-        public UserController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<User> logger, IService<User> service) 
+        public UserController(IMapper mapper, ILogger<User> logger, IService<User> service) 
         {
-            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _userService = service;
             _mapper = mapper;
             _logger = logger;
@@ -35,7 +32,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public IActionResult GetAll()
         {
-            var user = _userRepository.GetAll().ToArray();
+            var user = _userService.GetAllAsync().Result.ToArray();
 
             var resp = new GetUserResponse
             {
@@ -57,7 +54,7 @@ namespace BlogTask.API.Controllers
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
         {
-            var user = await _userRepository.GetAsync(guid);
+            var user = await _userService.GetAsync(guid);
 
             if (user == null)
             {
@@ -88,7 +85,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public async Task<IActionResult> Registration(UserRequest request)
         {
-            var user = await _userRepository.GetAsync(request.Guid);
+            var user = await _userService.GetAsync(request.Guid);
             if (user != null)
             {
                 _logger.LogWarning("Такой пользователь уже существует");
@@ -96,7 +93,7 @@ namespace BlogTask.API.Controllers
             }
 
             var newUser = _mapper.Map<UserRequest, User>(request);
-            await _userRepository.CreateAsync(newUser);
+            await _userService.CreateAsync(newUser);
 
             _logger.LogInformation("Регистрация нового пользователя прошла успешно в API");
 
@@ -112,7 +109,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public async Task<IActionResult> Update([FromBody] EditUserRequest request)
         {
-            var user = await _userRepository.GetAsync(request.Guid);
+            var user = await _userService.GetAsync(request.Guid);
             if (user == null)
             {
                 _logger.LogWarning("Такой пользователь не существует");
@@ -120,7 +117,7 @@ namespace BlogTask.API.Controllers
             }
                        
 
-            var updateUser = _userRepository.UpdateByUser(
+            var updateUser = await ((UserService)_userService).UpdateAsync(
                 user,
                 new UpdateUserQuery(
                     request.NewLogin,
@@ -146,14 +143,14 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var user = await _userRepository.GetAsync(id);
+            var user = await _userService.GetAsync(id);
             if (user == null)
             {
                 _logger.LogWarning("Пользователь не найден");
                 return StatusCode(400, "Пользователь не найден!");
             }
 
-            await _userRepository.DeleteAsync(user);
+            await _userService.DeleteAsync(user);
 
             _logger.LogInformation("Пользователя успешно удален через API");
 

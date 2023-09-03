@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlogTask.BLL.Services;
 using BlogTask.Contracts.Models.Article;
 using BlogTask.Contracts.Models.Comment;
 using BlogTask.Data.Models;
@@ -14,14 +15,12 @@ namespace BlogTask.API.Controllers
     [Route("[controller]")]
     public class CommentController : ControllerBase
     {
-        private readonly CommentsRepository _commentsRepository;
         private readonly IService<Comment> _commentService;
         private readonly IMapper _mapper;
         private readonly ILogger<Comment> _logger;
 
-        public CommentController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Comment> _logger, IService<Comment> service)
+        public CommentController(IMapper mapper, ILogger<Comment> _logger, IService<Comment> service)
         {
-            _commentsRepository = unitOfWork.GetRepository<Comment>() as CommentsRepository;
             _commentService = service;
             _mapper = mapper;
             _logger.LogInformation("Создан CommentController");
@@ -35,7 +34,7 @@ namespace BlogTask.API.Controllers
         [Route("")]
         public IActionResult GetAll()
         {
-            var comment = _commentsRepository.GetAll().ToArray();
+            var comment = _commentService.GetAllAsync().Result.ToArray();
 
             var resp = new GetCommentResponse
             {
@@ -57,7 +56,7 @@ namespace BlogTask.API.Controllers
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
         {
-            var comment = await _commentsRepository.GetAsync(guid);
+            var comment = await _commentService.GetAsync(guid);
 
             if (comment == null)
             {
@@ -88,7 +87,7 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Add(CommentRequest request)
         {
-            var comment = await _commentsRepository.GetAsync(request.Guid);
+            var comment = await _commentService.GetAsync(request.Guid);
             if (comment != null)
             {
                 _logger.LogWarning("Такой комментарий уже существует");
@@ -96,7 +95,7 @@ namespace BlogTask.API.Controllers
             }
 
             var newComment = _mapper.Map<CommentRequest, Comment>(request);
-            await _commentsRepository.CreateAsync(newComment);
+            await _commentService.CreateAsync(newComment);
 
             _logger.LogInformation("Комментарий успешно добавлена через API");
 
@@ -113,14 +112,14 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Update([FromBody] EditCommentRequest request)
         {
-            var comment = await _commentsRepository.GetAsync(request.Guid);
+            var comment = await _commentService.GetAsync(request.Guid);
             if (comment == null)
             {
                 _logger.LogWarning("Такой комментарий не существует");
                 return StatusCode(400, "Такой комментарий не существует!");
             }
 
-            var updateComment = _commentsRepository.UpdateByComment(
+            var updateComment = await ((CommentService)_commentService).UpdateAsync(
                 comment,
                 new UpdateCommentQuery(
                     request.NewText
@@ -143,14 +142,14 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(Guid guid)
         {
-            var comment =  await _commentsRepository.GetAsync(guid);
+            var comment =  await _commentService.GetAsync(guid);
             if (comment == null)
             {
                 _logger.LogWarning("Комментарий не найден");
                 return StatusCode(400, "Комментарий не найден!");
             }
 
-            await _commentsRepository.DeleteAsync(comment);
+            await _commentService.DeleteAsync(comment);
 
             _logger.LogInformation("Комментарий успешно удален через API");
 

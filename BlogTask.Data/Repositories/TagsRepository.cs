@@ -11,11 +11,8 @@ namespace BlogTask.Data.Repositories
         {
         }
 
-        public Tag UpdateByTag(Tag tag, UpdateTagQuery updateTagQuery)
+        public Tag UpdateByTag(Tag tag)
         {
-            if (!string.IsNullOrEmpty(updateTagQuery.NewName))
-                tag.Name = updateTagQuery.NewName;
-
             UpdateAsync(tag).Wait();
 
             return tag;

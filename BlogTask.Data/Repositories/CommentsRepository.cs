@@ -9,11 +9,8 @@ namespace BlogTask.Data.Repositories
         {
         }
 
-        public Comment UpdateByComment(Comment comment, UpdateCommentQuery updateCommentQuery)
+        public Comment UpdateByComment(Comment comment)
         {
-            if (!string.IsNullOrEmpty(updateCommentQuery.NewText))
-                comment.Text = updateCommentQuery.NewText;
-
             UpdateAsync(comment).Wait();
 
             return comment;
