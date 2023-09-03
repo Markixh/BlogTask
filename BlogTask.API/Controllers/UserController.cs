@@ -4,14 +4,11 @@ using BlogTask.Data.Models;
 using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using static BlogTask.Contracts.Models.Users.GetUserRequest;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BlogTask.Controllers
+namespace BlogTask.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -159,48 +156,6 @@ namespace BlogTask.Controllers
             _logger.LogInformation("Пользователя успешно удален через API");
 
             return StatusCode(200);
-        }
-
-        [HttpPost]
-        [Route("authenticate")]
-        public async Task<IActionResult> Authenticate(string login, string password)
-        {
-            if (String.IsNullOrEmpty(login) || String.IsNullOrEmpty(password))
-            {
-                _logger.LogWarning("Запрос для аутентификации не содержит имени пользователя и пароля");
-                return StatusCode(400, "Запрос не корректен!");
-            }
-
-            User user = _repository.GetByLogin(login);
-            if (user is null)
-            {
-                _logger.LogWarning("Пользователь не найден");
-                return StatusCode(400, "Пользователь на найден!");
-            }
-
-            if (user.Password != password)
-            {
-                _logger.LogWarning("Введенный пароль неправильный");
-                return StatusCode(400, "Введенный пароль не корректен!");
-            }
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
-            };
-
-            ClaimsIdentity claimsIdentity = new(
-                claims,
-                "AddCookies",
-                ClaimsIdentity.DefaultNameClaimType,
-                ClaimsIdentity.DefaultRoleClaimType);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-            _logger.LogInformation("Аутентификация успешно прошла через API");
-
-            return StatusCode(200, _mapper.Map<User, UserView>(user));
         }
     }
 }

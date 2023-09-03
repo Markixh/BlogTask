@@ -1,3 +1,12 @@
+using AutoMapper;
+using BlogTask.BLL.Services;
+using BlogTask.Data.Models;
+using BlogTask.Data.Repositories;
+using BlogTask.Data;
+using Microsoft.EntityFrameworkCore;
+using NLog;
+using NLog.Web;
+using BlogTask.API.Extensions;
 
 namespace BlogTask.API
 {
@@ -5,32 +14,93 @@ namespace BlogTask.API
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+            logger.Debug("init main");
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            try
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                var builder = WebApplication.CreateBuilder(args);
+
+                // Add services to the container.
+
+                var mapperConfig = new MapperConfiguration(mc =>
+                {
+                    mc.AddProfile(new MappingProfile());
+                });
+
+                IMapper mapper = mapperConfig.CreateMapper();
+                builder.Services.AddSingleton(mapper);
+
+                string? connection = Configuration.GetConnectionString("DefaultConnection");
+
+                builder.Services
+                   .AddDbContext<BlogContext>(options => options.UseSqlServer(connection))
+                   .AddUnitOfWork()
+                   .AddCustomRepository<User, UsersRepository>()
+                   .AddCustomRepository<Article, ArticlesRepository>()
+                   .AddCustomRepository<Tag, TagsRepository>()
+                   .AddCustomRepository<Comment, CommentsRepository>()
+                   .AddCustomRepository<Role, RolesRepository>();
+
+                builder.Services.AddTransient<IService<Article>, ArticleService>();
+
+                builder.Services.AddControllers();
+                // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+                builder.Services.AddEndpointsApiExplorer();
+                builder.Services.AddSwaggerGen();
+
+                builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies")
+                    .AddCookie("Cookies", options =>
+                    {
+                        options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+                        {
+                            OnRedirectToLogin = redirectContext =>
+                            {
+                                redirectContext.HttpContext.Response.StatusCode = 401;
+                                return Task.CompletedTask;
+                            }
+                        };
+                    });
+
+                // NLog: Setup NLog for Dependency injection
+                builder.Logging.ClearProviders();
+                builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                builder.Host.UseNLog();
+
+                var app = builder.Build();
+
+                // Configure the HTTP request pipeline.
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
+
+                app.UseHttpsRedirection();
+
+                app.UseAuthorization();
+
+                app.MapControllers();
+
+                app.Run();
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
+            catch (Exception exception)
+            {
+                // NLog: catch setup errors
+                logger.Error(exception, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                NLog.LogManager.Shutdown();
+            }
         }
+
+        private static IConfiguration Configuration { get; } = new ConfigurationBuilder()
+         .AddJsonFile("appsettings.json")
+         .AddJsonFile("appsettings.Development.json")
+         .Build();
     }
 }

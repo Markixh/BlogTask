@@ -6,11 +6,8 @@ using BlogTask.Models.Account;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
-using static BlogTask.Contracts.Models.Users.GetUserRequest;
 using System.Security.Claims;
 using BlogTask.Models;
 
@@ -240,6 +237,7 @@ namespace BlogTask.Controllers
             if (user is not null)
             {
                 model = _mapper.Map<User, UserViewModel>(user);
+
                 var role = await repositoryRole.GetAsync((int)user.RoleId);
 
                 if (role != null)
@@ -274,6 +272,7 @@ namespace BlogTask.Controllers
             if (user is not null)
             {
                 model = _mapper.Map<User, UserViewModel>(user);
+
                 var role = await repositoryRole.GetAsync((int)user.RoleId);
 
                 if (role != null)

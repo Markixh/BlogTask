@@ -5,7 +5,6 @@ using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NLog;
 using NLog.Web;
 
@@ -48,17 +47,6 @@ namespace BlogTask
                 // Add services to the container.
                 builder.Services.AddControllersWithViews();
 
-                builder.Services.AddSwaggerGen(options =>
-                {
-                    options.SwaggerDoc("v1",
-                    new Microsoft.OpenApi.Models.OpenApiInfo
-                    {
-                        Title = "Swagger Demo API",
-                        Description = "Demo API for showing Swagger",
-                        Version = "v1"
-                    });
-                });
-
                 builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies")
                     .AddCookie("Cookies", options =>
                     {
@@ -100,13 +88,6 @@ namespace BlogTask
                 app.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                app.UseSwagger();
-
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Swagger Demo API");
-                });
 
                 app.Run();
             }
