@@ -1,12 +1,21 @@
 ﻿using BlogTask.Data.Models;
+using BlogTask.Data.Repositories;
+using BlogTask.Data.UoW;
 
 namespace BlogTask.BLL.Services
 {
     public class TagService : IService<Tag>
     {
-        public Task CreateAsync(Tag item)
+        private readonly TagsRepository _tagsRepository;
+
+        public TagService(IUnitOfWork unitOfWork)
         {
-            throw new NotImplementedException();
+            _tagsRepository = unitOfWork.GetRepository<Tag>() as TagsRepository;
+        }
+
+        public async Task CreateAsync(Tag tag)
+        {
+            await _tagsRepository.CreateAsync(tag);
         }
 
         public Task DeleteAsync(Tag item)
@@ -14,14 +23,14 @@ namespace BlogTask.BLL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Tag>> GetAllAsync()
+        public async Task<IEnumerable<Tag>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return _tagsRepository.GetAll().ToArray();
         }
 
         public Task<Tag> GetAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _tagsRepository.GetAsync(id);
         }
 
         public Task<Tag> GetAsync(int id)
@@ -29,9 +38,9 @@ namespace BlogTask.BLL.Services
             throw new NotImplementedException();
         }
 
-        public Task UpdateAsync(Tag item)
+        public async Task UpdateAsync(Tag tag)
         {
-            throw new NotImplementedException();
+            await _tagsRepository.UpdateAsync(tag);
         }
     }
 }
