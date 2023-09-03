@@ -6,23 +6,22 @@ using BlogTask.Models;
 using Microsoft.AspNetCore.Mvc;
 using BlogTask.Models.Tag;
 using Microsoft.AspNetCore.Authorization;
+using BlogTask.BLL.Services;
 
 namespace BlogTask.Controllers
 {
     [Route("[controller]")]
     public class TagController : Controller
     {
-        private readonly TagsRepository _repository;
-        private readonly UsersRepository _usersRepository;
+        private readonly IService<User> _userService;
         private readonly IService<Tag> _tagService;
         private readonly IMapper _mapper;
         private readonly ILogger<Tag> _logger;
 
-        public TagController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Tag> logger, IService<Tag> service)
+        public TagController(IMapper mapper, ILogger<Tag> logger, IService<Tag> tagService, IService<User> userService)
         {
-            _repository = unitOfWork.GetRepository<Tag>() as TagsRepository;
-            _usersRepository = unitOfWork.GetRepository<User>() as UsersRepository;
-            _tagService = service;
+            _userService = userService;
+            _tagService = tagService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -51,7 +50,7 @@ namespace BlogTask.Controllers
         {
             var userName = User.Identity.Name;
 
-            var user = _usersRepository.GetByLogin(userName);
+            var user = await ((UserService)_userService).GetByLogin(userName);
 
             if (model is null)
             {
@@ -67,9 +66,9 @@ namespace BlogTask.Controllers
 
             if (ModelState.IsValid)
             {
-                var newRole = _mapper.Map<AddViewModel, Tag>(model);
+                var newTag = _mapper.Map<AddViewModel, Tag>(model);
 
-                await _repository.CreateAsync(newRole);
+                await _tagService.CreateAsync(newTag);
 
                 _logger.LogInformation("Тег успешно добавлена");
 
@@ -91,7 +90,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(Guid guid)
         {
-            var tag = await _repository.GetAsync(guid);
+            var tag = await _tagService.GetAsync(guid);
 
             var editTag = _mapper.Map<Tag, EditViewModel>(tag);
 
@@ -109,7 +108,7 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(EditViewModel model)
         {
-            var editTag = await _repository.GetAsync(model.Guid);
+            var editTag = await _tagService.GetAsync(model.Guid);
 
             if (model is null)
             {
@@ -122,7 +121,7 @@ namespace BlogTask.Controllers
                 if (editTag.Name != model.Name)
                 {
                     editTag.Name = model.Name;
-                    await _repository.UpdateAsync(editTag);
+                    await _tagService.UpdateAsync(editTag);
                 }
 
                 _logger.LogInformation("Тег успешно изменен");
@@ -144,7 +143,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public IActionResult List()
         {
-            var listTags = _repository.GetAll().ToList();
+            var listTags = _tagService.GetAllAsync().Result.ToList();
 
             if (listTags == null)
             {
@@ -175,7 +174,7 @@ namespace BlogTask.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewTagAsync(Guid guid)
         {
-            var tag = await _repository.GetAsync(guid);
+            var tag = await _tagService.GetAsync(guid);
             TagViewModel model = new();
 
             if (tag is not null)
@@ -199,14 +198,14 @@ namespace BlogTask.Controllers
         [Authorize]
         public async Task<IActionResult> Del(Guid guid)
         {
-            var tag = _repository.GetAsync(guid);
+            var tag = _tagService.GetAsync(guid);
             if (tag == null)
             {
                 _logger.LogWarning("Тег отсутствует");
                 return StatusCode(400, "Тэг не найден!");
             }
 
-            await _repository.DeleteAsync(await tag);
+            await _tagService.DeleteAsync(await tag);
 
             _logger.LogInformation("Тег успешно удален");
 

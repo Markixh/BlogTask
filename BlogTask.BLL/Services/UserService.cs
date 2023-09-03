@@ -1,6 +1,7 @@
 ﻿using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using System.Data;
 
 namespace BlogTask.BLL.Services
 {
@@ -18,9 +19,9 @@ namespace BlogTask.BLL.Services
             await _usersRepository.CreateAsync(user);
         }
 
-        public Task DeleteAsync(User item)
+        public async Task DeleteAsync(User user)
         {
-            throw new NotImplementedException();
+            await _usersRepository.DeleteAsync(user);
         }
 
         public async Task<IEnumerable<User>> GetAllAsync()
@@ -36,6 +37,11 @@ namespace BlogTask.BLL.Services
         public Task<User> GetAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<User>? GetByLogin(string login)
+        {
+            return _usersRepository?.GetByLogin(login);
         }
 
         public async Task UpdateAsync(User user)

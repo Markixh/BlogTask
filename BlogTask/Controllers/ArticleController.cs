@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlogTask.BLL.Services;
 using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
@@ -12,16 +13,16 @@ namespace BlogTask.Controllers
     [Route("[controller]")]
     public class ArticleController : Controller
     {
-        private readonly UsersRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IService<User> _userService;
         private readonly IService<Article> _articleService;
         private readonly ILogger<Article> _logger;
 
-        public ArticleController(IUnitOfWork unitOfWork, IMapper mapper, IService<Article> service, ILogger<Article> logger)
+        public ArticleController(IMapper mapper, IService<Article> articleService, IService<User> userService, ILogger<Article> logger)
         {
-            _userRepository = unitOfWork.GetRepository<User>() as UsersRepository;
             _mapper = mapper;
-            _articleService = service;
+            _userService = userService;
+            _articleService = articleService;
             _logger = logger;
             _logger.LogInformation("Создан AccountManagerController");
         }
@@ -50,7 +51,7 @@ namespace BlogTask.Controllers
         {
             var userName = User.Identity.Name;
 
-            var user = _userRepository.GetByLogin(userName);
+            var user = await ((UserService)_userService).GetByLogin(userName);
 
             if (model is null)
             {

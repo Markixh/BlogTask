@@ -1,6 +1,7 @@
 ﻿using BlogTask.Data.Models;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using System.Data;
 
 namespace BlogTask.BLL.Services
 {
@@ -18,9 +19,9 @@ namespace BlogTask.BLL.Services
             await _rolesRepository.CreateAsync(role);
         }
 
-        public Task DeleteAsync(Role item)
+        public async Task DeleteAsync(Role role)
         {
-            throw new NotImplementedException();
+            await _rolesRepository.DeleteAsync(role);
         }
 
         public async Task<IEnumerable<Role>> GetAllAsync()
