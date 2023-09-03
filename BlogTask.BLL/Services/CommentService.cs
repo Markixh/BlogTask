@@ -1,12 +1,21 @@
 ﻿using BlogTask.Data.Models;
+using BlogTask.Data.Repositories;
+using BlogTask.Data.UoW;
 
 namespace BlogTask.BLL.Services
 {
     public class CommentService : IService<Comment>
     {
-        public Task CreateAsync(Comment item)
+        private readonly CommentsRepository _commentsRepository;
+
+        public CommentService(IUnitOfWork unitOfWork)
         {
-            throw new NotImplementedException();
+            _commentsRepository = unitOfWork.GetRepository<Comment>() as CommentsRepository;
+        }
+
+        public async Task CreateAsync(Comment comment)
+        {
+            await _commentsRepository.CreateAsync(comment);
         }
 
         public Task DeleteAsync(Comment item)
@@ -14,14 +23,16 @@ namespace BlogTask.BLL.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Comment>> GetAllAsync()
+        public async Task<IEnumerable<Comment>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var comments = _commentsRepository.GetAll().ToArray();
+                        
+            return comments;
         }
 
         public Task<Comment> GetAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _commentsRepository.GetAsync(id);
         }
 
         public Task<Comment> GetAsync(int id)
@@ -29,9 +40,9 @@ namespace BlogTask.BLL.Services
             throw new NotImplementedException();
         }
 
-        public Task UpdateAsync(Comment item)
+        public async Task UpdateAsync(Comment comment)
         {
-            throw new NotImplementedException();
+            await _commentsRepository.UpdateAsync(comment);
         }
     }
 }
