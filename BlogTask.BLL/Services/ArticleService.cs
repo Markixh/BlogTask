@@ -21,9 +21,9 @@ namespace BlogTask.BLL.Services
             await _articlesRepository.CreateAsync(article);
         }
 
-        public Task DeleteAsync(Article item)
+        public async Task DeleteAsync(Article article)
         {
-            throw new NotImplementedException();
+            await _articlesRepository.DeleteAsync(article);
         }
 
         public async Task<IEnumerable<Article>> GetAllAsync()

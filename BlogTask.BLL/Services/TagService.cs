@@ -2,6 +2,7 @@
 using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using System.Data;
 
 namespace BlogTask.BLL.Services
 {
@@ -19,9 +20,9 @@ namespace BlogTask.BLL.Services
             await _tagsRepository.CreateAsync(tag);
         }
 
-        public Task DeleteAsync(Tag item)
+        public async Task DeleteAsync(Tag tag)
         {
-            throw new NotImplementedException();
+            await _tagsRepository.DeleteAsync(tag);
         }
 
         public async Task<IEnumerable<Tag>> GetAllAsync()

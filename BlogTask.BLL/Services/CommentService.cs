@@ -2,6 +2,7 @@
 using BlogTask.Data.Queries;
 using BlogTask.Data.Repositories;
 using BlogTask.Data.UoW;
+using System.Data;
 
 namespace BlogTask.BLL.Services
 {
@@ -19,9 +20,9 @@ namespace BlogTask.BLL.Services
             await _commentsRepository.CreateAsync(comment);
         }
 
-        public Task DeleteAsync(Comment item)
+        public async Task DeleteAsync(Comment comment)
         {
-            throw new NotImplementedException();
+            await _commentsRepository.DeleteAsync(comment);
         }
 
         public async Task<IEnumerable<Comment>> GetAllAsync()
