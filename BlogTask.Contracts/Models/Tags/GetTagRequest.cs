@@ -1,4 +1,6 @@
-﻿namespace BlogTask.Contracts.Models.Tags
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlogTask.Contracts.Models.Tags
 {
     public class GetTagResponse
     {
@@ -7,7 +9,9 @@
     }
     public class TagView
     {
+        [Required]
         public Guid Guid { get; set; }
+        [DataType(DataType.Text)]
         public string Name { get; set; }
     }
 }

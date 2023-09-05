@@ -4,8 +4,6 @@ using BlogTask.Contracts.Models.Article;
 using BlogTask.Contracts.Models.Tags;
 using BlogTask.Data.Models;
 using BlogTask.Data.Queries;
-using BlogTask.Data.Repositories;
-using BlogTask.Data.UoW;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +11,7 @@ namespace BlogTask.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Produces("application/json")]
     public class ArticleController : ControllerBase
     { 
         private readonly IMapper _mapper;
@@ -31,13 +30,28 @@ namespace BlogTask.API.Controllers
         /// Метод для получения всех статей
         /// </summary>
         /// <returns></returns>
+        /// <response code="201">Возвращает список статей</response>
+        /// <response code="400">Если статей нет</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("")]
         public async Task<IActionResult> GetAll()
         {
             var articles = _articleService.GetAllAsync().Result.ToArray();
 
-            var resp = new GetAeticleResponse
+            if (articles == null)
+            {
+                _logger.LogWarning("Статьи отсутствуют");
+                return StatusCode(400);
+            }
+            if (articles.Length == 0)
+            {
+                _logger.LogWarning("Статьи отсутствуют");
+                return StatusCode(400);
+            }
+
+            var resp = new GetArticleResponse
             {
                 ArticleAmount = articles.Length,
                 ArticleView = _mapper.Map<Article[], ArticleView[]>(articles)
@@ -45,7 +59,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Получен список статей в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -53,6 +67,10 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
+        /// <response code="201">Статья отсутствует</response>
+        /// <response code="400">Статья отсутствует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
@@ -62,7 +80,7 @@ namespace BlogTask.API.Controllers
             if (article == null)
             {
                 _logger.LogWarning("Статья отсутствует");
-                return StatusCode(400, $"Статья с Guid = {guid} отсутствует!");
+                return StatusCode(400);
             }
 
             var resp = new ArticleView
@@ -76,7 +94,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Статья передана в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -84,6 +102,19 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Пример запроса:
+        ///
+        ///     POST /Статьи
+        ///     {
+        ///        "title": "Название статьи",
+        ///        "text": "Текст статьи"
+        ///     }
+        /// 
+        /// </remarks>
+        /// <response code="201">Статья успешно добавлена</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [HttpPost]
         [Route("")]
         [Authorize]
@@ -94,7 +125,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Статья успешно добавлена через API");
 
-            return StatusCode(200, newArticle);
+            return StatusCode(201, newArticle);
         }
 
         /// <summary>
@@ -102,6 +133,22 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Пример запроса:
+        ///
+        ///     PATCH /Статьи
+        ///     {
+        ///        "guid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        ///        "newTitle": "Название статьи",
+        ///        "newText": "Текст статьи"
+        ///     }
+        /// 
+        /// </remarks>
+        /// <response code="201">Статья успешно добавлена</response>
+        /// <response code="400">Статья отсутствует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPatch]
         [Route("")]
         [Authorize]
@@ -111,7 +158,7 @@ namespace BlogTask.API.Controllers
             if (article == null)
             {
                 _logger.LogWarning("Статья отсутствует");
-                return StatusCode(400, "Такая статья не существует!");
+                return StatusCode(400);
             }
 
             var updateArticle = await ((ArticleService)_articleService).UpdateAsync(
@@ -125,7 +172,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Статья изменена через API");
 
-            return StatusCode(200, resultArticle);
+            return StatusCode(201, resultArticle);
         }
 
         /// <summary>
@@ -133,6 +180,10 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
+        /// <response code="201">Статья успешно удалена</response>
+        /// <response code="400">Статья отсутствует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete]
         [Route("")]
         [Authorize]
@@ -142,14 +193,14 @@ namespace BlogTask.API.Controllers
             if (article == null)
             {
                 _logger.LogWarning("Статья не найдена");
-                return StatusCode(400, "Статья не найдена!");
+                return StatusCode(400);
             }
 
             await _articleService.DeleteAsync(article);
 
             _logger.LogInformation("Статья удалена через API");
 
-            return StatusCode(200);
+            return StatusCode(201);
         }
     }
 }

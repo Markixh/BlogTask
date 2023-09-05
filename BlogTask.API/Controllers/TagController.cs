@@ -12,6 +12,7 @@ namespace BlogTask.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Produces("application/json")]
     public class TagController : ControllerBase
     {
         private readonly IService<Tag> _tagService;
@@ -29,21 +30,36 @@ namespace BlogTask.API.Controllers
         /// Метод для получения всех тэгов
         /// </summary>
         /// <returns></returns>
+        /// <response code="201">Возвращает список тегов</response>
+        /// <response code="400">Если тегов нет</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("")]
         public IActionResult GetAll()
         {
-            var tag = _tagService.GetAllAsync().Result.ToArray();
+            var tags = _tagService.GetAllAsync().Result.ToArray();
+
+            if (tags == null)
+            {
+                _logger.LogWarning("Статьи отсутствуют");
+                return StatusCode(400);
+            }
+            if (tags.Length == 0)
+            {
+                _logger.LogWarning("Статьи отсутствуют");
+                return StatusCode(400);
+            }
 
             var resp = new GetTagResponse
             {
-                TagAmount = tag.Length,
-                TagView = _mapper.Map<Tag[], TagView[]>(tag)
+                TagAmount = tags.Length,
+                TagView = _mapper.Map<Tag[], TagView[]>(tags)
             };
 
             _logger.LogInformation("Получен список тегов в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -51,6 +67,10 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
+        /// <response code="201">Возвращает тег</response>
+        /// <response code="400">Если тега нет</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
@@ -60,7 +80,7 @@ namespace BlogTask.API.Controllers
             if (tag == null)
             {
                 _logger.LogWarning("Тег отсутствует");
-                return StatusCode(400, $"Tэг с Guid = {guid} отсутствует!");
+                return StatusCode(400);
             }
 
             var resp = new TagView
@@ -71,7 +91,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Тег передана в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -79,6 +99,14 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Для добавления тега необходимы права модератора
+        /// </remarks>
+        /// <response code="201">Тег успешно добавлен</response>
+        /// <response code="400">Такой тег уже существует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Модератор")]
         [HttpPost]
         [Route("")]
         [Authorize]
@@ -87,8 +115,8 @@ namespace BlogTask.API.Controllers
             var tag = await _tagService.GetAsync(request.Guid);
             if (tag != null)
             {
-                _logger.LogWarning("Тег отсутствует");
-                return StatusCode(400, "Такой тэг уже существует!");
+                _logger.LogWarning("Такой тег существует");
+                return StatusCode(400);
             }
 
             var newTag = _mapper.Map<TagRequest, Tag>(request);
@@ -96,7 +124,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Тег успешно добавлен через API");
 
-            return StatusCode(200, newTag);
+            return StatusCode(201, newTag);
         }
 
         /// <summary>
@@ -104,6 +132,14 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Для изменения тега необходимы права модератора
+        /// </remarks>
+        /// <response code="201">Тег успешно изменен</response>
+        /// <response code="400">Если тега нет</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Модератор")]
         [HttpPatch]
         [Route("")]
         [Authorize]
@@ -113,7 +149,7 @@ namespace BlogTask.API.Controllers
             if (tag == null)
             {
                 _logger.LogWarning("Такой тэг не существует");
-                return StatusCode(400, "Такой тэг не существует!");
+                return StatusCode(400);
             }
 
             var updateTag = await ((TagService)_tagService).UpdateAsync(
@@ -125,7 +161,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Тег успешно изменен через API");
 
-            return StatusCode(200, resultTag);
+            return StatusCode(201, resultTag);
         }
 
         /// <summary>
@@ -133,6 +169,14 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Для удаления тега необходимы права модератора
+        /// </remarks>
+        /// <response code="201">Тег успешно удален</response>
+        /// <response code="400">Если тега нет</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Модератор")]
         [HttpDelete]
         [Route("")]
         [Authorize]
@@ -149,7 +193,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Тег успешно удален через API");
 
-            return StatusCode(200);
+            return StatusCode(201);
         }
     }
 }

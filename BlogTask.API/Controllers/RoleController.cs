@@ -11,6 +11,7 @@ namespace BlogTask.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Produces("application/json")]
     public class RoleController : ControllerBase
     {
         private readonly IService<User> _userService;
@@ -31,21 +32,36 @@ namespace BlogTask.API.Controllers
         /// Метод для получения всех ролей
         /// </summary>
         /// <returns></returns>
+        /// <response code="201">Возвращает список ролей</response>
+        /// <response code="400">Если ролей нет</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("")]
         public IActionResult GetAll()
         {
-            var role = _roleService.GetAllAsync().Result.ToArray();
+            var roles = _roleService.GetAllAsync().Result.ToArray();
+
+            if (roles == null)
+            {
+                _logger.LogWarning("Статьи отсутствуют");
+                return StatusCode(400);
+            }
+            if (roles.Length == 0)
+            {
+                _logger.LogWarning("Статьи отсутствуют");
+                return StatusCode(400);
+            }
 
             var resp = new GetRoleResponse
             {
-                RoleAmount = role.Length,
-                RoleView = _mapper.Map<Role[], RoleView[]>(role)
+                RoleAmount = roles.Length,
+                RoleView = _mapper.Map<Role[], RoleView[]>(roles)
             };
 
             _logger.LogInformation("Получен список ролей в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -53,6 +69,10 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
+        /// <response code="201">Возвращает роль</response>
+        /// <response code="400">Если роль отсутствует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(int guid)
@@ -62,7 +82,7 @@ namespace BlogTask.API.Controllers
             if (role == null)
             {
                 _logger.LogWarning("Роль отсутствует");
-                return StatusCode(400, $"Роль с id = {guid} отсутствует!");
+                return StatusCode(400);
             }
 
             var resp = new RoleView
@@ -74,7 +94,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Роль передана в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -82,6 +102,14 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Для добавления роли необходимы права администратора
+        /// </remarks>
+        /// <response code="201">Роль успешно добавлена</response>
+        /// <response code="400">Такая роль уже существует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Администратор")]
         [HttpPost]
         [Route("")]
         [Authorize]
@@ -91,7 +119,7 @@ namespace BlogTask.API.Controllers
             if (role != null)
             {
                 _logger.LogWarning("Роль отсутствует");
-                return StatusCode(400, "Такая роль уже существует!");
+                return StatusCode(400);
             }
 
             var newRole = _mapper.Map<RoleRequest, Role>(request);
@@ -99,7 +127,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Роль успешно добавлена через API");
 
-            return StatusCode(200, newRole);
+            return StatusCode(201, newRole);
         }
 
         /// <summary>
@@ -107,6 +135,14 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Для изменения роли необходимы права администратора
+        /// </remarks>
+        /// <response code="201">Роль успешно изменена</response>
+        /// <response code="400">Роль отсутствует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Администратор")]
         [HttpPatch]
         [Route("")]
         [Authorize]
@@ -116,7 +152,7 @@ namespace BlogTask.API.Controllers
             if (role == null)
             {
                 _logger.LogWarning("Такая роль не существует");
-                return StatusCode(400, "Такая роль не существует!");
+                return StatusCode(400);
             }
 
             var updateRole = await ((RoleService)_roleService).UpdateAsync(
@@ -129,7 +165,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Роль успешно изменена через API");
 
-            return StatusCode(200, resultRole);
+            return StatusCode(201, resultRole);
         }
 
         /// <summary>
@@ -137,6 +173,14 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Для удаления роли необходимы права администратора
+        /// </remarks>
+        /// <response code="201">Роль успешно удалена</response>
+        /// <response code="400">Роль отсутствует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Администратор")]
         [HttpDelete]
         [Route("")]
         [Authorize]
@@ -146,14 +190,14 @@ namespace BlogTask.API.Controllers
             if (role == null)
             {
                 _logger.LogWarning("Такой роли не найдено");
-                return StatusCode(400, "Роль не найдена!");
+                return StatusCode(400);
             }
 
             await _roleService.DeleteAsync(role);
 
-            _logger.LogInformation("Hjkm успешно удалена через API");
+            _logger.LogInformation("Роль успешно удалена через API");
 
-            return StatusCode(200);
+            return StatusCode(201);
         }
     }
 }

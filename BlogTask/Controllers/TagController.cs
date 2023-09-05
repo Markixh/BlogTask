@@ -40,7 +40,7 @@ namespace BlogTask.Controllers
         }
 
         /// <summary>
-        /// Обработка данных для добавления роли
+        /// Обработка данных для добавления тега
         /// </summary>
         /// <returns></returns>
         [Route("Add")]

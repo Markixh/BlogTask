@@ -11,6 +11,7 @@ namespace BlogTask.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Produces("application/json")]
     public class UserController : ControllerBase
     {
         private readonly IService<User> _userService;
@@ -28,21 +29,36 @@ namespace BlogTask.API.Controllers
         /// Метод для получения всех пользователей
         /// </summary>
         /// <returns></returns>
+        /// <response code="201">Возвращает список всех пользователей</response>
+        /// <response code="400">Если пользователи отсутствуют</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("")]
         public IActionResult GetAll()
         {
-            var user = _userService.GetAllAsync().Result.ToArray();
+            var users = _userService.GetAllAsync().Result.ToArray();
+
+            if (users == null)
+            {
+                _logger.LogWarning("Пользователи отсутствуют");
+                return StatusCode(400);
+            }
+            if (users.Length == 0)
+            {
+                _logger.LogWarning("Пользователи отсутствуют");
+                return StatusCode(400);
+            }
 
             var resp = new GetUserResponse
             {
-                UserAmount = user.Length,
-                UserView = _mapper.Map<User[], UserView[]>(user)
+                UserAmount = users.Length,
+                UserView = _mapper.Map<User[], UserView[]>(users)
             };
 
             _logger.LogInformation("Получен список пользователей в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -50,6 +66,10 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
+        /// <response code="201">Возвращает пользователя</response>
+        /// <response code="400">Если пользователь отсутствуют</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("byGuid")]
         public async Task<IActionResult> GetByGuid(Guid guid)
@@ -59,7 +79,7 @@ namespace BlogTask.API.Controllers
             if (user == null)
             {
                 _logger.LogWarning("Пользователь отсутствует");
-                return StatusCode(400, $"Пользователь с Guid = {guid} отсутствует!");
+                return StatusCode(400);
             }
 
             var resp = new UserView
@@ -73,7 +93,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Данные пользователя переданы в API");
 
-            return StatusCode(200, resp);
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -81,6 +101,10 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <response code="201">Пользователь успешно зарегистрирован</response>
+        /// <response code="400">Такой пользователь уже существует</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
         [Route("")]
         public async Task<IActionResult> Registration(UserRequest request)
@@ -97,7 +121,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Регистрация нового пользователя прошла успешно в API");
 
-            return StatusCode(200, newUser);
+            return StatusCode(201, newUser);
         }
 
         /// <summary>
@@ -105,6 +129,10 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <response code="201">Данные по пользователю изменены</response>
+        /// <response code="400">Если пользователи отсутствуют</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPatch]
         [Route("")]
         public async Task<IActionResult> Update([FromBody] EditUserRequest request)
@@ -113,9 +141,8 @@ namespace BlogTask.API.Controllers
             if (user == null)
             {
                 _logger.LogWarning("Такой пользователь не существует");
-                return StatusCode(400, "Такой пользователь не существует!");
-            }
-                       
+                return StatusCode(400);
+            }                       
 
             var updateUser = await ((UserService)_userService).UpdateAsync(
                 user,
@@ -130,7 +157,7 @@ namespace BlogTask.API.Controllers
 
             _logger.LogInformation("Данные пользователя успешно изменены через API");
 
-            return StatusCode(200, resultUser);
+            return StatusCode(201, resultUser);
         }
 
         /// <summary>
@@ -138,6 +165,14 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Для удаления пользователя необходимы права администратора
+        /// </remarks>
+        /// <response code="201">Пользователь успешно удален</response>
+        /// <response code="400">Если пользователи отсутствуют</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Администратор")]
         [Authorize]
         [HttpDelete]
         [Route("")]
@@ -147,14 +182,14 @@ namespace BlogTask.API.Controllers
             if (user == null)
             {
                 _logger.LogWarning("Пользователь не найден");
-                return StatusCode(400, "Пользователь не найден!");
+                return StatusCode(400);
             }
 
             await _userService.DeleteAsync(user);
 
             _logger.LogInformation("Пользователя успешно удален через API");
 
-            return StatusCode(200);
+            return StatusCode(201);
         }
     }
 }

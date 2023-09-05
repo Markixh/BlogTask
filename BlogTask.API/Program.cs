@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
 using BlogTask.API.Extensions;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace BlogTask.API
 {
@@ -50,7 +52,24 @@ namespace BlogTask.API
                 builder.Services.AddControllers();
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
                 builder.Services.AddEndpointsApiExplorer();
-                builder.Services.AddSwaggerGen();
+                builder.Services.AddSwaggerGen(options =>
+                {
+                    options.SwaggerDoc("v1", new OpenApiInfo
+                    {
+                        Version = "v1",
+                        Title = "Blog API",
+                        Description = "ASP.NET Core Web API для управления бизнес-моделями Блога",
+                        Contact = new OpenApiContact
+                        {
+                            Name = "Андрей Марков",
+                            Email = "Andrejmarko@yandex.ru"
+                        }
+                    });
+
+                    // using System.Reflection;
+                    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+                });
 
                 builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies")
                     .AddCookie("Cookies", options =>

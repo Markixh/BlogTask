@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using BlogTask.Data.Models;
-using BlogTask.Data.Repositories;
-using BlogTask.Data.UoW;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogTask.Controllers

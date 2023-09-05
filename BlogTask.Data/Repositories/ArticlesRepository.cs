@@ -15,7 +15,10 @@ namespace BlogTask.Data.Repositories
         {
             var article = Set.Where(a => a.Guid == guid).FirstOrDefault();
 
-            _db.Entry(article).Collection(_ => _.Tags).Load();
+            if (article != null)
+            {
+                _db.Entry(article).Collection(_ => _.Tags).Load();
+            }
 
             return article;
         }
