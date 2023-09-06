@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BlogTask.Contracts.Models.Article;
 using BlogTask.Contracts.Models.Comment;
+using BlogTask.Contracts.Models.Role;
 using BlogTask.Contracts.Models.Tags;
 using BlogTask.Contracts.Models.Users;
 using BlogTask.Data.Models;
@@ -14,6 +15,7 @@ namespace BlogTask.API
         {
             CreateMap<UserRequest, User>();
             CreateMap<User, UserRequest>();
+            CreateMap<Role, RoleRequest>();
             CreateMap<ArticleRequest, Article>();
             CreateMap<Article, ArticleRequest>();
             CreateMap<CommentRequest, Comment>();
@@ -22,6 +24,7 @@ namespace BlogTask.API
             CreateMap<Tag, TagRequest>();
 
             CreateMap<User, UserView>();
+            CreateMap<Role, RoleView>();
             CreateMap<UserView, User>();
             CreateMap<Article, ArticleView>();
             CreateMap<Tag, TagView>();

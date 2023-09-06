@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using static BlogTask.Contracts.Models.Users.GetUserRequest;
 using Microsoft.AspNetCore.Authorization;
 using BlogTask.BLL.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using Azure.Core;
+using System;
 
 namespace BlogTask.API.Controllers
 {
@@ -15,12 +20,14 @@ namespace BlogTask.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IService<User> _userService;
+        private readonly IService<Role> _roleService;
         private readonly IMapper _mapper;
         private readonly ILogger<User> _logger;
 
-        public UserController(IMapper mapper, ILogger<User> logger, IService<User> service) 
+        public UserController(IMapper mapper, ILogger<User> logger, IService<User> userService, IService<Role> roleService)
         {
-            _userService = service;
+            _userService = userService;
+            _roleService = roleService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -101,21 +108,24 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Пример запроса:
+        /// 
+        ///     POST /Пользователи
+        ///     {
+        ///        "login": "Логин пользователя",
+        ///        "firstName": "Имя",
+        ///        "lastName": "Фамилия",
+        ///        "surName": "Отчество",
+        ///        "password": "Пароль"
+        ///     }     
+        /// </remarks>
         /// <response code="201">Пользователь успешно зарегистрирован</response>
-        /// <response code="400">Такой пользователь уже существует</response>
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
         [Route("")]
         public async Task<IActionResult> Registration(UserRequest request)
         {
-            var user = await _userService.GetAsync(request.Guid);
-            if (user != null)
-            {
-                _logger.LogWarning("Такой пользователь уже существует");
-                return StatusCode(400, "Такой пользователь уже существует!");
-            }
-
             var newUser = _mapper.Map<UserRequest, User>(request);
             await _userService.CreateAsync(newUser);
 
@@ -129,6 +139,19 @@ namespace BlogTask.API.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Пример запроса:
+        /// 
+        ///     PATCH /Пользователи
+        ///     {
+        ///        "Guid": "Guid пользователя"
+        ///        "newLogin": "Логин пользователя",
+        ///        "newFirstName": "Имя",
+        ///        "newLastName": "Фамилия",
+        ///        "newSurName": "Отчество",
+        ///        "newPassword": "Пароль"
+        ///     }     
+        /// </remarks>
         /// <response code="201">Данные по пользователю изменены</response>
         /// <response code="400">Если пользователи отсутствуют</response>
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -142,7 +165,7 @@ namespace BlogTask.API.Controllers
             {
                 _logger.LogWarning("Такой пользователь не существует");
                 return StatusCode(400);
-            }                       
+            }
 
             var updateUser = await ((UserService)_userService).UpdateAsync(
                 user,
@@ -191,5 +214,103 @@ namespace BlogTask.API.Controllers
 
             return StatusCode(201);
         }
+
+        /// <summary>
+        /// Аутентификация пользователя
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Пример запроса:
+        /// 
+        ///     POST /Пользователи
+        ///     {
+        ///        "login": "Логин пользователя",
+        ///        "firstName": "Имя",
+        ///        "lastName": "Фамилия",
+        ///        "surName": "Отчество",
+        ///        "password": "Пароль"
+        ///     }     
+        /// </remarks>
+        /// <response code="201">Пользователь успешно прошел аутентификацию</response>
+        /// <response code="400">Данные заданы не корректно</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Route("Login")]
+        [HttpPost]
+        public async Task<IActionResult> Login(UserRequest request)
+        {
+            if (String.IsNullOrEmpty(request.Login) || String.IsNullOrEmpty(request.Password))
+            {
+                _logger.LogWarning("Логин или пароль не заданы");
+                return StatusCode(400);
+            }
+
+            var user = _mapper.Map<User>(request);
+
+            if (user is null)
+            {
+                _logger.LogWarning("запрос пустой");
+                return StatusCode(400);
+            }
+
+            if (!await PasswordIsCorrect(user))
+            {
+                _logger.LogWarning("Пароль введен не правильный");
+                return StatusCode(400, "Введенный пароль не корректен!");
+            }
+
+            var roleId = ((UserService)_userService)?.GetByLogin(user.Login).Result.RoleId;
+
+            var roleName = roleId is null ? "Пользователь" : _roleService?.GetAsync((int)roleId).Result.Name;
+            roleName = roleName is null ? "Пользователь" : roleName;
+
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, roleName)
+                };
+
+            ClaimsIdentity claimsIdentity = new(
+                claims,
+                "AddCookies",
+                ClaimsIdentity.DefaultNameClaimType,
+                ClaimsIdentity.DefaultRoleClaimType);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            _logger.LogInformation("Пользователь успешно авторизовался");
+            return StatusCode(201);
+        }
+
+        /// <summary>
+        /// Метод, выхода из аккаунта
+        /// </summary>
+        /// <response code="201">Пользователь вышел</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [Route("Logout")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            _logger.LogInformation("Пользователь успешно вышел с сайта");
+
+            return StatusCode(201);
+        }
+
+        private async Task<bool> PasswordIsCorrect(User user)
+        {
+            var findUser = await ((UserService)_userService).GetByLogin(user.Login);
+
+            if (findUser is null) { return false; }
+
+            if (user.Password == null) { return false; }
+
+            if (findUser.Password != user.Password) { return false; }
+
+            return true;
+        }
     }
+
 }

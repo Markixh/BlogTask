@@ -3,9 +3,7 @@
 namespace BlogTask.Contracts.Models.Users
 {
     public class UserRequest
-    {
-        [Required]
-        public Guid Guid { get; set; }
+    {        
         [Required]
         public string Login { get; set; }
         [DataType(DataType.Text)]

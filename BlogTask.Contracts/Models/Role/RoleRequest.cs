@@ -8,7 +8,5 @@ namespace BlogTask.Contracts.Models.Role
         public string Name { get; set; }
         [DataType(DataType.Text)]
         public string Description { get; set; }
-        [Required]
-        public int Id { get; set; }
     }
 }

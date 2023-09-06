@@ -101,24 +101,22 @@ namespace BlogTask.API.Controllers
         /// <returns></returns>
         /// <remarks>
         /// Для добавления тега необходимы права модератора
+        /// 
+        /// Пример запроса:
+        /// 
+        ///     POST /Теги
+        ///     {
+        ///        "name": "Название тега"
+        ///     }
         /// </remarks>
         /// <response code="201">Тег успешно добавлен</response>
-        /// <response code="400">Такой тег уже существует</response>
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = "Модератор")]
         [HttpPost]
         [Route("")]
         [Authorize]
         public async Task<IActionResult> Add(TagRequest request)
         {
-            var tag = await _tagService.GetAsync(request.Guid);
-            if (tag != null)
-            {
-                _logger.LogWarning("Такой тег существует");
-                return StatusCode(400);
-            }
-
             var newTag = _mapper.Map<TagRequest, Tag>(request);
             await _tagService.CreateAsync(newTag);
 
@@ -134,6 +132,14 @@ namespace BlogTask.API.Controllers
         /// <returns></returns>
         /// <remarks>
         /// Для изменения тега необходимы права модератора
+        /// 
+        /// Пример запроса:
+        /// 
+        ///     PATCH /Теги
+        ///     {
+        ///        "Guid": "guid тега"
+        ///        "newName": "Название тега"
+        ///     }
         /// </remarks>
         /// <response code="201">Тег успешно изменен</response>
         /// <response code="400">Если тега нет</response>

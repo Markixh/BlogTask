@@ -104,6 +104,14 @@ namespace BlogTask.API.Controllers
         /// <returns></returns>
         /// <remarks>
         /// Для добавления роли необходимы права администратора
+        /// 
+        /// Пример запроса:
+        /// 
+        ///     POST /Роли
+        ///     {
+        ///        "name": "Название роли",
+        ///        "description": "описание роли"
+        ///     }
         /// </remarks>
         /// <response code="201">Роль успешно добавлена</response>
         /// <response code="400">Такая роль уже существует</response>
@@ -115,10 +123,10 @@ namespace BlogTask.API.Controllers
         [Authorize]
         public async Task<IActionResult> Add(RoleRequest request)
         {
-            var role = await _roleService.GetAsync(request.Id);
+            var role = _roleService.GetAllAsync().Result.ToArray();
             if (role != null)
             {
-                _logger.LogWarning("Роль отсутствует");
+                _logger.LogWarning("Такая роль уже существует");
                 return StatusCode(400);
             }
 
@@ -136,7 +144,16 @@ namespace BlogTask.API.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         /// <remarks>
-        /// Для изменения роли необходимы права администратора
+        /// Для добавления роли необходимы права администратора
+        /// 
+        /// Пример запроса:
+        /// 
+        ///     PATCH /Роли
+        ///     {
+        ///        "id": "id роли",
+        ///        "newName": "Название роли",
+        ///        "newDescription": "описание роли"
+        ///     }
         /// </remarks>
         /// <response code="201">Роль успешно изменена</response>
         /// <response code="400">Роль отсутствует</response>
